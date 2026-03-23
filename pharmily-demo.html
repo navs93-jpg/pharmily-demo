@@ -17,7 +17,7 @@
 <canvas id="pillCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;border-radius:34px;"></canvas>
 <div class="screens" style="position:relative;z-index:1;will-change:transform;">
 
-<div class="scr on" id="s-splash" style="opacity:1;pointer-events:all;" style="background:#27500A;background-image:none;">
+<div class="scr on" id="s-splash" style="background:#27500A;background-image:none;">
   <div class="splash-inner">
     <div class="slogo">Pharmi<span>ly</span></div>
     <div class="stag">Your pharmacist, in your pocket.<br>Medication care that follows you.</div>
@@ -427,7 +427,7 @@ const mgR={
 };
 const defR={a:"Based on your current medications — Metformin, Lisinopril, and Atorvastatin — I can help with general guidance. For specific medical decisions, always confirm with your licensed pharmacist.",x:{t:"safe",txt:"For personalised advice, connect with a licensed pharmacist in real time."},r:["Talk to a pharmacist","What interactions should I know?"]};
 
-function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));const el=document.getElementById(id);if(el)el.classList.add('on');}
+function go(id){document.querySelectorAll('.scr').forEach(s=>{s.classList.remove('on');s.style.opacity='0';s.style.pointerEvents='none';});const el=document.getElementById(id);if(el){el.classList.add('on');el.style.opacity='1';el.style.pointerEvents='all';}}
 function navGo(id){
   go(id);
   document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('on',n.getAttribute('data-nav')===id));
