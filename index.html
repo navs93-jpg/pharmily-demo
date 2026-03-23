@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmily — Digital Pharmacy Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0A1A0F;min-height:100vh;color:white;overflow-x:hidden;}
+
+/* ── HERO ── */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px 48px;text-align:center;position:relative;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(59,109,17,.35),transparent);pointer-events:none;}
+.logo{font-size:52px;font-weight:700;letter-spacing:-2px;color:white;position:relative;}
+.logo span{color:#5DCAA5;}
+.logo-badge{display:inline-block;font-size:12px;font-weight:500;background:rgba(93,202,165,.15);color:#5DCAA5;border:1px solid rgba(93,202,165,.3);border-radius:20px;padding:4px 14px;margin-left:8px;vertical-align:middle;letter-spacing:.05em;}
+.tagline{font-size:22px;font-weight:400;color:rgba(255,255,255,.75);margin:18px 0 10px;line-height:1.5;max-width:520px;}
+.tagline strong{color:white;font-weight:500;}
+.sub-tagline{font-size:14px;color:rgba(255,255,255,.45);margin-bottom:44px;max-width:420px;line-height:1.6;}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:56px;}
+.hbadge{font-size:12px;padding:6px 14px;border-radius:20px;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);}
+
+/* ── APP CARDS ── */
+.apps{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;padding:0 24px 64px;position:relative;}
+.app-card{width:340px;border-radius:24px;overflow:hidden;background:#0F1F14;border:1px solid rgba(255,255,255,.08);transition:transform .25s,border-color .25s;}
+.app-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.18);}
+
+/* Phone preview */
+.card-preview{padding:28px 28px 0;display:flex;justify-content:center;background:linear-gradient(180deg,rgba(59,109,17,.15) 0%,transparent 100%);}
+.mini-phone{width:150px;background:#1A1A1A;border-radius:24px;padding:6px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.mini-screen{border-radius:19px;overflow:hidden;height:280px;display:flex;flex-direction:column;}
+
+/* Patient mini screen */
+.ps-hdr{background:#27500A;padding:8px 10px 6px;color:white;}
+.ps-hdr .g{font-size:8px;opacity:.7;}
+.ps-hdr .n{font-size:12px;font-weight:600;}
+.ps-hdr .s{font-size:7px;opacity:.6;}
+.ps-ring{display:flex;align-items:center;gap:6px;background:rgba(59,109,17,.9);margin:6px 8px 8px;border-radius:9px;padding:6px 8px;}
+.ps-ring svg{width:32px;height:32px;flex-shrink:0;}
+.ps-ring-lbl{position:absolute;font-size:8px;font-weight:600;color:white;}
+.ps-ring-wrap{position:relative;width:32px;height:32px;flex-shrink:0;}
+.ps-ri{color:white;}
+.ps-ri .t{font-size:8px;font-weight:500;}
+.ps-ri .s2{font-size:7px;opacity:.75;}
+.ps-meds{padding:0 8px;display:flex;flex-direction:column;gap:4px;}
+.ps-med{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.9);border-radius:7px;padding:5px 7px;}
+.ps-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.ps-mn{font-size:8px;font-weight:500;color:#1A2E0A;flex:1;}
+.ps-b{font-size:7px;padding:1px 5px;border-radius:10px;}
+.ps-bt{background:#EAF3DE;color:#3B6D11;}
+.ps-bd{background:#FAEEDA;color:#854F0B;}
+.ps-ba{background:#FCEBEB;color:#A32D2D;}
+.ps-nav{display:flex;justify-content:space-around;padding:5px 4px 6px;background:rgba(255,255,255,.95);border-top:.5px solid #C0DD97;margin-top:auto;}
+.ps-ni{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:6px;color:#6B7A5E;}
+.ps-ni.on{color:#3B6D11;}
+.ps-ni-ic{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;}
+.ps-ni.on .ps-ni-ic{background:#EAF3DE;}
+
+/* Pharmacist mini screen */
+.rx-hdr{background:#085041;padding:8px 10px 8px;color:white;}
+.rx-hdr .g{font-size:7px;opacity:.7;}
+.rx-hdr .n{font-size:11px;font-weight:600;}
+.rx-hdr .s{font-size:7px;opacity:.6;}
+.rx-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px 8px;}
+.rx-stat{background:white;border-radius:7px;padding:5px 6px;text-align:center;}
+.rx-stat.ac{background:#0F6E56;}
+.rx-sv{font-size:13px;font-weight:600;color:#085041;}
+.rx-stat.ac .rx-sv{color:white;}
+.rx-sl{font-size:7px;color:#5A7269;}
+.rx-stat.ac .rx-sl{color:rgba(255,255,255,.75);}
+.rx-qlbl{font-size:7px;font-weight:500;color:#5A7269;text-transform:uppercase;letter-spacing:.05em;padding:0 8px;margin-bottom:4px;}
+.rx-q{padding:0 8px;display:flex;flex-direction:column;gap:3px;}
+.rx-qi{display:flex;align-items:center;gap:5px;background:white;border-radius:7px;padding:5px 7px;}
+.rx-qi.urg{border-left:2px solid #E24B4A;}
+.rx-qav{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:600;flex-shrink:0;}
+.rx-qn{font-size:8px;font-weight:500;color:#04342C;flex:1;}
+.rx-qb{font-size:6px;padding:1px 5px;border-radius:8px;}
+.rx-nav{display:flex;justify-content:space-around;padding:5px 4px 6px;background:rgba(255,255,255,.95);border-top:.5px solid #9FE1CB;margin-top:auto;}
+.rx-ni{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:6px;color:#5A7269;}
+.rx-ni.on{color:#0F6E56;}
+.rx-ni-ic{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;}
+.rx-ni.on .rx-ni-ic{background:#E1F5EE;}
+
+/* Card content */
+.card-content{padding:24px 28px 28px;}
+.card-role{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.card-role.patient{color:#9FE1CB;}
+.card-role.pharma{color:#5DCAA5;}
+.card-title{font-size:22px;font-weight:600;color:white;margin-bottom:8px;letter-spacing:-.3px;}
+.card-desc{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:20px;}
+.card-features{display:flex;flex-direction:column;gap:7px;margin-bottom:24px;}
+.cf{display:flex;align-items:center;gap:9px;font-size:13px;color:rgba(255,255,255,.7);}
+.cf-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cf-dot.g{background:#5DCAA5;}
+.cta{display:block;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;text-decoration:none;transition:opacity .2s,transform .15s;}
+.cta:hover{opacity:.88;transform:scale(.98);}
+.cta.patient{background:#3B6D11;color:white;}
+.cta.pharma{background:#0F6E56;color:white;}
+
+/* ── STATS STRIP ── */
+.stats-strip{display:flex;justify-content:center;gap:0;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:32px 24px;margin-bottom:0;}
+.stat-item{flex:1;min-width:140px;text-align:center;padding:12px 20px;border-right:1px solid rgba(255,255,255,.06);}
+.stat-item:last-child{border-right:none;}
+.stat-n{font-size:28px;font-weight:600;color:white;letter-spacing:-.5px;}
+.stat-n span{color:#5DCAA5;}
+.stat-l{font-size:12px;color:rgba(255,255,255,.45);margin-top:3px;}
+
+/* ── FEATURES ── */
+.features{padding:64px 24px;max-width:900px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:500;color:#5DCAA5;text-transform:uppercase;letter-spacing:.1em;text-align:center;margin-bottom:10px;}
+.section-title{font-size:30px;font-weight:600;color:white;text-align:center;margin-bottom:10px;letter-spacing:-.5px;}
+.section-sub{font-size:15px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:44px;line-height:1.6;max-width:500px;margin-left:auto;margin-right:auto;}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.feat{background:#0F1F14;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 22px 20px;}
+.feat-icon{font-size:22px;margin-bottom:12px;}
+.feat-title{font-size:15px;font-weight:500;color:white;margin-bottom:6px;}
+.feat-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;}
+
+/* ── FOOTER ── */
+.footer{border-top:1px solid rgba(255,255,255,.06);padding:32px 24px;text-align:center;}
+.footer-logo{font-size:22px;font-weight:600;color:white;margin-bottom:6px;}
+.footer-logo span{color:#5DCAA5;}
+.footer-sub{font-size:12px;color:rgba(255,255,255,.35);line-height:1.6;}
+.footer-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+.ftag{font-size:11px;padding:4px 12px;border-radius:20px;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:rgba(255,255,255,.06);margin:0 24px;}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="logo">Pharmi<span>ly</span> <span class="logo-badge">Demo</span></div>
+  <div class="tagline">Pharmacy care,<br><strong>reimagined for the digital age.</strong></div>
+  <div class="sub-tagline">A pharmacist-led digital health platform connecting patients with licensed pharmacists — on demand, in their language, on their schedule.</div>
+  <div class="hero-badges">
+    <div class="hbadge">HIPAA Compliant</div>
+    <div class="hbadge">24/7 Pharmacist Access</div>
+    <div class="hbadge">AI-Powered MedGuide</div>
+    <div class="hbadge">MTM Billing Ready</div>
+    <div class="hbadge">California Pilot</div>
+  </div>
+</div>
+
+<!-- APP CARDS -->
+<div class="apps">
+
+  <!-- Patient App Card -->
+  <div class="app-card">
+    <div class="card-preview">
+      <div class="mini-phone">
+        <div class="mini-screen" style="background-color:#F4F7F2;background-image:repeating-linear-gradient(-45deg,transparent,transparent 5px,rgba(144,192,90,0.12) 5px,rgba(144,192,90,0.12) 6px);">
+          <div class="ps-hdr">
+            <div class="g">Good morning,</div>
+            <div class="n">Navjot</div>
+            <div class="s">Monday · 3 reminders today</div>
+          </div>
+          <div class="ps-ring">
+            <div class="ps-ring-wrap">
+              <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="3"/><circle cx="16" cy="16" r="12" fill="none" stroke="white" stroke-width="3" stroke-dasharray="62 75" stroke-linecap="round" transform="rotate(-90 16 16)"/></svg>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;font-weight:700;color:white;">82%</div>
+            </div>
+            <div class="ps-ri"><div class="t">Adherence this week</div><div class="s2">9 of 11 doses taken</div></div>
+          </div>
+          <div style="font-size:7px;font-weight:500;color:#6B7A5E;text-transform:uppercase;letter-spacing:.05em;padding:0 8px;margin-bottom:5px;">Today's medications</div>
+          <div class="ps-meds">
+            <div class="ps-med"><div class="ps-dot" style="background:#639922"></div><div class="ps-mn">Metformin 500mg</div><div class="ps-b ps-bt">Taken</div></div>
+            <div class="ps-med"><div class="ps-dot" style="background:#BA7517"></div><div class="ps-mn">Lisinopril 10mg</div><div class="ps-b ps-bd">Due</div></div>
+            <div class="ps-med"><div class="ps-dot" style="background:#E24B4A"></div><div class="ps-mn">Atorvastatin 20mg</div><div class="ps-b ps-ba">Review</div></div>
+          </div>
+          <div class="ps-nav">
+            <div class="ps-ni on"><div class="ps-ni-ic">&#9638;</div><span>Home</span></div>
+            <div class="ps-ni"><div class="ps-ni-ic">&#128138;</div><span>Meds</span></div>
+            <div class="ps-ni"><div class="ps-ni-ic">&#128172;</div><span>Consult</span></div>
+            <div class="ps-ni"><div class="ps-ni-ic">&#129302;</div><span>AI</span></div>
+            <div class="ps-ni"><div class="ps-ni-ic">&#128100;</div><span>Profile</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-content">
+      <div class="card-role patient">Patient App</div>
+      <div class="card-title">For patients &amp; caregivers</div>
+      <div class="card-desc">Manage medications, track adherence, access licensed pharmacists on demand, and get AI-powered guidance — all in one place.</div>
+      <div class="card-features">
+        <div class="cf"><div class="cf-dot g"></div>Medication management &amp; reminders</div>
+        <div class="cf"><div class="cf-dot g"></div>24/7 pharmacist consultation</div>
+        <div class="cf"><div class="cf-dot g"></div>AI MedGuide with interaction alerts</div>
+        <div class="cf"><div class="cf-dot g"></div>OTC symptom checker</div>
+        <div class="cf"><div class="cf-dot g"></div>Blood pressure &amp; glucose tracker</div>
+        <div class="cf"><div class="cf-dot g"></div>OCR medication label scanner</div>
+      </div>
+      <a class="cta patient" href="pharmily-demo.html">Explore patient app →</a>
+    </div>
+  </div>
+
+  <!-- Pharmacist App Card -->
+  <div class="app-card">
+    <div class="card-preview">
+      <div class="mini-phone">
+        <div class="mini-screen" style="background:#F2F6F7;">
+          <div class="rx-hdr">
+            <div class="g">Welcome back,</div>
+            <div class="n">Dr. Ravi Sharma</div>
+            <div class="s">PharmD · California</div>
+          </div>
+          <div class="rx-stats">
+            <div class="rx-stat ac"><div class="rx-sv">3</div><div class="rx-sl">In queue</div></div>
+            <div class="rx-stat"><div class="rx-sv" style="color:#085041">12</div><div class="rx-sl">Today</div></div>
+            <div class="rx-stat"><div class="rx-sv" style="color:#085041">7</div><div class="rx-sl">MTM</div></div>
+            <div class="rx-stat"><div class="rx-sv" style="color:#085041">94%</div><div class="rx-sl">Rating</div></div>
+          </div>
+          <div class="rx-qlbl">Queue</div>
+          <div class="rx-q">
+            <div class="rx-qi urg"><div class="rx-qav" style="background:#E1F5EE;color:#085041">NS</div><div class="rx-qn">Navjot Singh</div><div class="rx-qb" style="background:#FCEBEB;color:#A32D2D">Urgent</div></div>
+            <div class="rx-qi"><div class="rx-qav" style="background:#E6F1FB;color:#185FA5">PK</div><div class="rx-qn">Priya Kaur</div><div class="rx-qb" style="background:#FAEEDA;color:#854F0B">Soon</div></div>
+            <div class="rx-qi"><div class="rx-qav" style="background:#FAEEDA;color:#854F0B">MR</div><div class="rx-qn">Maria Rodriguez</div><div class="rx-qb" style="background:#E1F5EE;color:#085041">Routine</div></div>
+          </div>
+          <div class="rx-nav">
+            <div class="rx-ni on"><div class="rx-ni-ic">&#9638;</div><span>Dashboard</span></div>
+            <div class="rx-ni"><div class="rx-ni-ic">&#128203;</div><span>Queue</span></div>
+            <div class="rx-ni"><div class="rx-ni-ic">&#128196;</div><span>History</span></div>
+            <div class="rx-ni"><div class="rx-ni-ic">&#128100;</div><span>Profile</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-content">
+      <div class="card-role pharma">Pharmacist App</div>
+      <div class="card-title">For licensed pharmacists</div>
+      <div class="card-desc">Manage your consultation queue, review patient medication profiles, conduct live chat and video consults, and document MTM sessions with CPT billing codes.</div>
+      <div class="card-features">
+        <div class="cf"><div class="cf-dot g"></div>Live consultation queue with urgency</div>
+        <div class="cf"><div class="cf-dot g"></div>Full patient medication review</div>
+        <div class="cf"><div class="cf-dot g"></div>Real-time chat &amp; video consultations</div>
+        <div class="cf"><div class="cf-dot g"></div>MTM session notes + CPT billing</div>
+        <div class="cf"><div class="cf-dot g"></div>Session history &amp; audit logs</div>
+        <div class="cf"><div class="cf-dot g"></div>Availability toggle &amp; performance stats</div>
+      </div>
+      <a class="cta pharma" href="pharmily-pharmacist.html">Explore pharmacist app →</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item"><div class="stat-n">$<span>528</span>B</div><div class="stat-l">Annual medication non-adherence cost</div></div>
+  <div class="stat-item"><div class="stat-n"><span>350</span>M+</div><div class="stat-l">Digital health app users globally</div></div>
+  <div class="stat-item"><div class="stat-n">$<span>500</span>B+</div><div class="stat-l">US pharmacy market annually</div></div>
+  <div class="stat-item"><div class="stat-n"><span>24</span>/7</div><div class="stat-l">Licensed pharmacist access</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="section-label">Why Pharmily</div>
+  <div class="section-title">Built to close the gap</div>
+  <div class="section-sub">Retail pharmacy interactions average under 2 minutes. Pharmily gives patients the time and access they deserve.</div>
+  <div class="feature-grid">
+    <div class="feat"><div class="feat-icon">&#128172;</div><div class="feat-title">On-demand consultations</div><div class="feat-desc">Chat or video with a licensed pharmacist any time — no appointment, no waiting room, no rushed interaction.</div></div>
+    <div class="feat"><div class="feat-icon">&#129302;</div><div class="feat-title">AI MedGuide</div><div class="feat-desc">Contextual medication guidance powered by AI, personalised to the patient's actual prescription list. Always escalates to a pharmacist when needed.</div></div>
+    <div class="feat"><div class="feat-icon">&#127760;</div><div class="feat-title">Multilingual support</div><div class="feat-desc">Translated medication instructions in Punjabi, Hindi, Spanish and more — serving communities that are consistently underserved by retail pharmacy.</div></div>
+    <div class="feat"><div class="feat-icon">&#128203;</div><div class="feat-title">MTM &amp; billing ready</div><div class="feat-desc">Structured session notes with CMS-compliant CPT code selection — making MTM reimbursement straightforward for pharmacist partners.</div></div>
+    <div class="feat"><div class="feat-icon">&#128274;</div><div class="feat-title">HIPAA compliant</div><div class="feat-desc">Encrypted data at rest and in transit, role-based access controls, and comprehensive audit logging from day one.</div></div>
+    <div class="feat"><div class="feat-icon">&#128200;</div><div class="feat-title">Adherence tracking</div><div class="feat-desc">Patients log doses, view trends, and share reports with their pharmacist — closing the loop between counselling and real-world behaviour.</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo">Pharmi<span>ly</span></div>
+  <div class="footer-sub">Concept demo · Built for investor and partner review<br>Founded by Navjot Singh, PharmD · Pilot state: California</div>
+  <div class="footer-tags">
+    <div class="ftag">Digital Health</div>
+    <div class="ftag">Pharmacy Tech</div>
+    <div class="ftag">MTM</div>
+    <div class="ftag">Medication Adherence</div>
+    <div class="ftag">Telehealth</div>
+    <div class="ftag">AI-Assisted Care</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmily — Patient App Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.page-title{color:rgba(255,255,255,.5);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;}
+.phone-outer{width:320px;}
+.frame{background:#1A1A1A;border-radius:44px;padding:12px;box-shadow:0 40px 80px rgba(0,0,0,.6);}
+.phone{border-radius:34px;overflow:hidden;height:640px;display:flex;flex-direction:column;position:relative;background-color:#F4F7F2;background-image:repeating-linear-gradient(-45deg,transparent,transparent 5px,rgba(144,192,90,0.12) 5px,rgba(144,192,90,0.12) 6px);}
+.screens{position:relative;flex:1;overflow:hidden;}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s;background-color:#F4F7F2;background-image:repeating-linear-gradient(-45deg,transparent,transparent 5px,rgba(144,192,90,0.12) 5px,rgba(144,192,90,0.12) 6px);}
+.scr.on{opacity:1;pointer-events:all;}
+.sb{display:flex;justify-content:space-between;padding:9px 16px 2px;font-size:11px;}
+.sb.dg{background:#27500A;color:rgba(255,255,255,.65);}
+.dghdr{background:#27500A;color:white;}
+.g-btn{background:#3B6D11;color:white;border-radius:12px;padding:11px 14px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;}
+.g-btn:hover{background:#27500A;}
+.g-btn-o{background:#EAF3DE;color:#3B6D11;border:.5px solid #C0DD97;border-radius:12px;padding:11px 14px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;}
+.slbl{font-size:11px;font-weight:500;color:#6B7A5E;text-transform:uppercase;letter-spacing:.06em;padding:0 15px;margin-bottom:8px;}
+.back{font-size:16px;opacity:.75;cursor:pointer;padding:2px 4px;color:white;}
+.mbadge{font-size:10px;padding:3px 8px;border-radius:20px;flex-shrink:0;}
+.bt{background:#EAF3DE;color:#3B6D11;}
+.bd{background:#FAEEDA;color:#854F0B;}
+.ba{background:#FCEBEB;color:#A32D2D;}
+
+/* NAV */
+.nav{display:flex;justify-content:space-around;align-items:center;padding:8px 4px 12px;background:rgba(255,255,255,.97);border-top:.5px solid #C0DD97;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#6B7A5E;cursor:pointer;flex:1;transition:color .15s;}
+.ni.on{color:#3B6D11;}
+.ni-ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.ni.on .ni-ic{background:#EAF3DE;}
+.ni.consult{color:#27500A;}
+.ni.consult.on{color:#3B6D11;}
+.ni.consult.on .ni-ic{background:#3B6D11;color:white;}
+
+/* SPLASH */
+#s-splash{background:#27500A;background-image:none;}
+.splash-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#27500A;}
+.slogo{font-size:36px;font-weight:600;color:white;letter-spacing:-1px;}
+.slogo span{color:#9FE1CB;}
+.stag{font-size:13px;color:rgba(255,255,255,.6);text-align:center;margin:10px 0 32px;line-height:1.7;}
+.sbtn{width:100%;background:white;color:#27500A;border-radius:14px;padding:14px;text-align:center;font-size:14px;font-weight:600;margin-bottom:11px;cursor:pointer;transition:opacity .15s;}
+.sbtn:hover{opacity:.9;}
+.sbtn.o{background:rgba(255,255,255,.15);color:white;border:.5px solid rgba(255,255,255,.3);}
+.sdots{display:flex;gap:6px;margin-top:22px;}
+.sd{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);}
+.sd.on{width:18px;border-radius:4px;background:white;}
+
+/* ONBOARD */
+.ob-top{background:#27500A;color:white;padding:12px 16px 15px;}
+.ob-step{font-size:11px;opacity:.65;margin-bottom:4px;}
+.ob-title{font-size:18px;font-weight:500;}
+.ob-sub{font-size:11px;opacity:.7;margin-top:2px;line-height:1.5;}
+.ob-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.ob-lbl{font-size:11px;color:#6B7A5E;margin-bottom:3px;}
+.ob-inp{background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:10px;padding:10px 12px;font-size:12px;color:#1A2E0A;}
+.ob-inp.ph{color:#9A8E88;}
+.consent-box{background:#EAF3DE;border:.5px solid #C0DD97;border-radius:11px;padding:10px 12px;}
+.cb-row{display:flex;gap:9px;align-items:flex-start;}
+.cb-chk{width:16px;height:16px;border-radius:4px;background:#3B6D11;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;flex-shrink:0;margin-top:1px;}
+.cb-txt{font-size:11px;color:#3B5A18;line-height:1.5;}
+.disc-box{background:#F4F7F2;border:.5px solid #C0DD97;border-radius:10px;padding:8px 11px;font-size:10px;color:#6B7A5E;line-height:1.5;}
+
+/* HOME */
+.home-top{background:#27500A;color:white;padding:11px 16px 0;}
+.ring-row{display:flex;align-items:center;gap:11px;background:rgba(59,109,17,.93);margin:11px 14px 13px;border-radius:14px;padding:11px 13px;color:white;}
+.rw{position:relative;width:50px;height:50px;flex-shrink:0;}
+.rw svg{width:50px;height:50px;}
+.rl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:500;color:white;}
+.ri-p{display:flex;gap:5px;margin-top:6px;}
+.rpp{background:rgba(255,255,255,.18);border-radius:20px;padding:2px 8px;font-size:10px;}
+.med-stack{padding:0 14px;display:flex;flex-direction:column;gap:7px;}
+.mrow{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.9);border-radius:12px;border:.5px solid #C0DD97;padding:9px 11px;cursor:pointer;transition:background .15s;}
+.mrow:hover{background:white;}
+.mdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mn{font-size:12px;font-weight:500;color:#1A2E0A;flex:1;}
+.ms{font-size:10px;color:#6B7A5E;}
+
+/* MED LIST */
+.search-bar{margin:10px 14px 8px;background:rgba(255,255,255,.88);border:.5px solid #C0DD97;border-radius:22px;padding:8px 13px;font-size:11px;color:#6B7A5E;display:flex;align-items:center;gap:7px;}
+.fchips{display:flex;gap:6px;padding:0 14px 9px;}
+.fc{font-size:10px;padding:4px 11px;border-radius:20px;border:.5px solid #C0DD97;cursor:pointer;}
+.fc.on{background:#3B6D11;color:white;border-color:#3B6D11;}
+.fc.off{background:rgba(255,255,255,.7);color:#6B7A5E;}
+.med-block{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:13px;padding:10px 12px;cursor:pointer;margin-bottom:7px;transition:background .15s;}
+.med-block:hover{background:white;}
+.cb{width:3px;height:34px;border-radius:2px;flex-shrink:0;}
+.mbi{flex:1;}
+.mbn{font-size:12px;font-weight:500;color:#1A2E0A;}
+.mbs{font-size:10px;color:#6B7A5E;margin-top:1px;}
+.mbr{text-align:right;}
+.mbr-v{font-size:13px;font-weight:500;color:#3B6D11;}
+.mbr-l{font-size:9px;color:#6B7A5E;}
+
+/* MED DETAIL */
+.det-top{background:#27500A;color:white;padding:10px 15px 15px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px 13px;}
+.ig{background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:10px;padding:9px 10px;}
+.ig-l{font-size:10px;color:#6B7A5E;margin-bottom:2px;}
+.ig-v{font-size:13px;font-weight:500;color:#1A2E0A;}
+.adh-wrap{padding:0 13px 11px;}
+.adh-track{height:7px;background:#C0DD97;border-radius:4px;overflow:hidden;}
+.adh-fill{height:100%;background:#3B6D11;border-radius:4px;}
+.week-row{display:flex;gap:4px;padding:0 13px 11px;}
+.wd{flex:1;text-align:center;}
+.wd-d{font-size:9px;color:#6B7A5E;margin-bottom:3px;}
+.wd-dot{width:22px;height:22px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;}
+.wt{background:#3B6D11;color:white;}
+.wm{background:#FCEBEB;color:#A32D2D;}
+.wu{background:rgba(192,221,151,.3);color:#6B7A5E;}
+
+/* SCANNER */
+.scan-vf{background:#1A2E0A;margin:11px 14px;border-radius:13px;height:128px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;}
+.sc{position:absolute;width:20px;height:20px;border-color:#9FE1CB;border-style:solid;}
+.sc.tl{top:9px;left:9px;border-width:2px 0 0 2px;border-radius:3px 0 0 0;}
+.sc.tr{top:9px;right:9px;border-width:2px 2px 0 0;border-radius:0 3px 0 0;}
+.sc.bl{bottom:9px;left:9px;border-width:0 0 2px 2px;border-radius:0 0 0 3px;}
+.sc.br{bottom:9px;right:9px;border-width:0 2px 2px 0;border-radius:0 0 3px 0;}
+.scan-line{width:75%;height:2px;background:#9FE1CB;animation:scanmove 2s ease-in-out infinite;}
+@keyframes scanmove{0%,100%{transform:translateY(-32px)}50%{transform:translateY(32px)}}
+.sr-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:.5px solid #EAF3DE;}
+.sr-row:last-child{border-bottom:none;}
+.sr-k{font-size:11px;color:#6B7A5E;}
+.sr-v{font-size:11px;font-weight:500;color:#1A2E0A;}
+
+/* OTC */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{font-size:11px;padding:5px 11px;border-radius:20px;border:.5px solid #C0DD97;cursor:pointer;}
+.chip.on{background:#3B6D11;color:white;border-color:#3B6D11;}
+.chip.off{background:rgba(255,255,255,.7);color:#3B6D11;}
+.otc-rec{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:.5px solid #EAF3DE;}
+.otc-rec:last-child{border-bottom:none;}
+.otr-dot{width:7px;height:7px;border-radius:50%;background:#3B6D11;flex-shrink:0;}
+
+/* CONSULT */
+.chat-hdr{background:#27500A;color:white;padding:10px 14px 12px;display:flex;align-items:center;gap:9px;}
+.c-av{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;}
+.chat-msgs{flex:1;padding:11px 12px 8px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;}
+.tchip{align-self:center;font-size:10px;color:#6B7A5E;background:rgba(192,221,151,.4);border-radius:20px;padding:3px 10px;}
+.bbl{max-width:80%;}
+.bbl.r .bt2{background:rgba(255,255,255,.92);border:.5px solid #C0DD97;border-radius:4px 12px 12px 12px;color:#1A2E0A;}
+.bbl.s{align-self:flex-end;}
+.bbl.s .bt2{background:#3B6D11;border-radius:12px 4px 12px 12px;color:white;}
+.bt2{padding:7px 10px;font-size:12px;line-height:1.5;}
+.bts{font-size:9px;color:#6B7A5E;margin-top:2px;padding:0 3px;}
+.bbl.s .bts{text-align:right;}
+.chat-in-bar{display:flex;gap:7px;padding:8px 12px 9px;background:rgba(255,255,255,.96);border-top:.5px solid #C0DD97;align-items:center;}
+.chat-in{flex:1;background:#F4F7F2;border:.5px solid #C0DD97;border-radius:22px;padding:8px 13px;font-size:12px;color:#1A2E0A;outline:none;font-family:inherit;}
+.chat-in::placeholder{color:#9A8E88;}
+.chat-send{width:32px;height:32px;border-radius:50%;background:#3B6D11;color:white;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:none;flex-shrink:0;}
+.chat-send:hover{background:#27500A;}
+
+/* HEALTH */
+.ht-tabs{display:flex;background:#3B6D11;}
+.ht-tab{flex:1;text-align:center;padding:8px;font-size:11px;color:rgba(255,255,255,.6);cursor:pointer;}
+.ht-tab.on{color:white;border-bottom:2px solid white;}
+.ht-body{flex:1;padding:11px 13px;display:flex;flex-direction:column;gap:9px;overflow:hidden;}
+.mini-bars{display:flex;align-items:flex-end;gap:4px;height:42px;}
+.mb{flex:1;border-radius:3px 3px 0 0;}
+.mb-g{background:#639922;}
+.mb-o{background:#BA7517;}
+.mb-d{font-size:9px;color:#6B7A5E;text-align:center;margin-top:2px;}
+.hist{background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;overflow:hidden;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:7px 11px;border-bottom:.5px solid #EAF3DE;}
+.hist-row:last-child{border-bottom:none;}
+.hb{font-size:9px;padding:2px 7px;border-radius:20px;}
+.hb-n{background:#EAF3DE;color:#3B6D11;}
+.hb-w{background:#FAEEDA;color:#854F0B;}
+
+/* NOTIFS */
+.notif-card{display:flex;gap:9px;align-items:flex-start;background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;padding:9px 11px;margin-bottom:7px;}
+.notif-card.unread{border-left:3px solid #3B6D11;}
+.notif-card.warn{border-left:3px solid #E24B4A;}
+.ni-icon2{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ni-g{background:#EAF3DE;}
+.ni-r{background:#FCEBEB;}
+.ni-o{background:#FAEEDA;}
+
+/* PROFILE */
+.prof-top{background:#27500A;color:white;padding:12px 15px 17px;}
+.prof-av{width:44px;height:44px;border-radius:50%;background:#3B6D11;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:white;}
+.pchip{font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);}
+.prof-sec{background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;overflow:hidden;margin-bottom:7px;}
+.prof-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:.5px solid #EAF3DE;cursor:pointer;transition:background .15s;}
+.prof-row:hover{background:rgba(255,255,255,.6);}
+.prof-row:last-child{border-bottom:none;}
+.pr-left{display:flex;align-items:center;gap:9px;}
+.pr-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;background:#EAF3DE;}
+
+/* MEDGUIDE */
+.mg-hdr{background:#27500A;color:white;padding:13px 15px 15px;display:flex;align-items:center;gap:11px;}
+.mg-orb{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mg-orb-d{width:17px;height:17px;border-radius:50%;background:rgba(255,255,255,.85);}
+.mg-bdg{font-size:10px;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.85);}
+.sug-area{padding:11px 13px 9px;}
+.sug-lbl{font-size:11px;color:#6B7A5E;margin-bottom:7px;}
+.sug-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.sug{font-size:11px;padding:6px 11px;border-radius:20px;background:rgba(255,255,255,.9);border:.5px solid #C0DD97;color:#27500A;cursor:pointer;transition:background .15s;}
+.sug:hover{background:white;}
+.mg-chat{flex:1;padding:10px 13px 8px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;}
+.ub-w{align-self:flex-end;max-width:83%;}
+.ub{background:#3B6D11;border-radius:13px 3px 13px 13px;color:white;padding:8px 11px;font-size:12px;line-height:1.5;}
+.ut{font-size:9px;color:#6B7A5E;text-align:right;margin-top:2px;}
+.ab-w{display:flex;gap:7px;align-items:flex-start;max-width:91%;}
+.ab-av{width:24px;height:24px;border-radius:50%;background:#27500A;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.ab-av-d{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.85);}
+.ab{background:rgba(255,255,255,.92);border:.5px solid #C0DD97;border-radius:3px 12px 12px 12px;padding:8px 10px;font-size:12px;color:#1A2E0A;line-height:1.5;}
+.ab-t{font-size:9px;color:#6B7A5E;margin-top:2px;padding:0 3px;}
+.src-c{margin-left:31px;background:#EAF3DE;border:.5px solid #C0DD97;border-radius:9px;padding:7px 10px;font-size:10px;color:#27500A;line-height:1.4;}
+.warn-c{margin-left:31px;background:#FCEBEB;border:.5px solid #F7C1C1;border-radius:9px;padding:7px 10px;font-size:10px;color:#501313;line-height:1.4;}
+.esc-c{margin-left:31px;background:#27500A;border-radius:10px;padding:10px 12px;cursor:pointer;transition:opacity .15s;}
+.esc-c:hover{opacity:.85;}
+.esc-t{font-size:12px;font-weight:500;color:white;text-align:center;}
+.esc-s{font-size:10px;color:rgba(255,255,255,.7);text-align:center;margin-top:2px;}
+.typing{display:flex;gap:5px;align-items:center;padding:8px 11px;}
+.td{width:8px;height:8px;border-radius:50%;background:#C0DD97;animation:bnc .9s infinite;}
+.td:nth-child(2){animation-delay:.2s;}
+.td:nth-child(3){animation-delay:.4s;}
+@keyframes bnc{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.qr-row{display:flex;gap:6px;flex-wrap:wrap;padding:6px 13px 8px;}
+.qr{font-size:10px;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.9);border:.5px solid #C0DD97;color:#27500A;cursor:pointer;transition:background .15s;}
+.qr:hover{background:white;}
+.mg-in-row{display:flex;gap:7px;padding:8px 13px 10px;background:rgba(255,255,255,.96);border-top:.5px solid #C0DD97;align-items:center;}
+.mg-in{flex:1;background:#F4F7F2;border:.5px solid #C0DD97;border-radius:22px;padding:8px 13px;font-size:12px;color:#1A2E0A;outline:none;font-family:inherit;}
+.mg-in::placeholder{color:#9A8E88;}
+.mg-snd{width:32px;height:32px;border-radius:50%;background:#3B6D11;color:white;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:none;flex-shrink:0;transition:background .15s;}
+.mg-snd:hover{background:#27500A;}
+.disc{font-size:9px;color:#6B7A5E;text-align:center;padding:4px 13px 5px;line-height:1.4;}
+</style>
+</head>
+<body>
+<div class="page-title">Pharmily · Patient App Demo</div>
+<div class="phone-outer">
+<div class="frame">
+<div class="phone">
+<div class="screens">
+
+<!-- SPLASH -->
+<div class="scr on" id="s-splash" style="background:#27500A;background-image:none;">
+  <div class="splash-inner">
+    <div class="slogo">Pharmi<span>ly</span></div>
+    <div class="stag">Your pharmacist, in your pocket.<br>Medication care that follows you.</div>
+    <div class="sbtn" id="btn-register">Create an account</div>
+    <div class="sbtn o" id="btn-signin">Sign in</div>
+    <div class="sdots"><div class="sd on"></div><div class="sd"></div><div class="sd"></div></div>
+  </div>
+</div>
+
+<!-- ONBOARD 1 -->
+<div class="scr" id="s-ob1">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="ob-top"><div class="ob-step">Step 1 of 3 · Your profile</div><div class="ob-title">Tell us about you</div><div class="ob-sub">We use this to personalise your experience.</div></div>
+  <div class="ob-body">
+    <div><div class="ob-lbl">Full name</div><div class="ob-inp">Navjot Singh</div></div>
+    <div><div class="ob-lbl">Date of birth</div><div class="ob-inp">15 / 08 / 1977</div></div>
+    <div><div class="ob-lbl">Primary language</div><div class="ob-inp ph">Select language ▾</div></div>
+    <div><div class="ob-lbl">State</div><div class="ob-inp ph">California ▾</div></div>
+    <div class="g-btn" id="btn-ob1" style="margin-top:auto">Continue →</div>
+  </div>
+</div>
+
+<!-- CONSENT -->
+<div class="scr" id="s-ob3">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="ob-top"><div class="ob-step">Step 3 of 3 · Consent</div><div class="ob-title">Your data, protected</div><div class="ob-sub">HIPAA-compliant. Please review and accept.</div></div>
+  <div style="height:12px"></div>
+  <div class="consent-box" style="margin:0 15px 9px"><div class="cb-row"><div class="cb-chk">✓</div><div class="cb-txt">I agree to Pharmily's Privacy Policy and Terms of Use.</div></div></div>
+  <div class="consent-box" style="margin:0 15px 9px"><div class="cb-row"><div class="cb-chk">✓</div><div class="cb-txt">I consent to sharing my health information with licensed pharmacists for counselling only.</div></div></div>
+  <div class="disc-box" style="margin:0 15px 11px">Pharmily provides pharmacist-led guidance only. It does not diagnose conditions or prescribe medications.</div>
+  <div class="g-btn" id="btn-ob3" style="margin:0 15px">Get started →</div>
+</div>
+
+<!-- HOME -->
+<div class="scr" id="s-home">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="home-top"><div style="font-size:12px;opacity:.7">Good morning,</div><div style="font-size:19px;font-weight:500">Navjot</div><div style="font-size:11px;opacity:.6;padding-bottom:2px">Monday · 3 reminders today</div></div>
+  <div style="height:11px"></div>
+  <div class="ring-row">
+    <div class="rw"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="4.5"/><circle cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="4.5" stroke-dasharray="103 126" stroke-linecap="round" transform="rotate(-90 25 25)"/></svg><div class="rl">82%</div></div>
+    <div><div style="font-size:13px;font-weight:500;color:white">Adherence this week</div><div style="font-size:11px;opacity:.75;color:white">9 of 11 doses taken</div><div class="ri-p"><div class="rpp">5 meds</div><div class="rpp">1 flag</div></div></div>
+  </div>
+  <div class="slbl">Today's medications</div>
+  <div class="med-stack">
+    <div class="mrow" id="btn-hm-met"><div class="mdot" style="background:#639922"></div><div style="flex:1"><div class="mn">Metformin 500mg</div><div class="ms">With breakfast · 8:00 AM</div></div><div class="mbadge bt">Taken</div></div>
+    <div class="mrow" id="btn-hm-lis"><div class="mdot" style="background:#BA7517"></div><div style="flex:1"><div class="mn">Lisinopril 10mg</div><div class="ms">Morning · Due now</div></div><div class="mbadge bd">Due</div></div>
+    <div class="mrow" id="btn-hm-ato"><div class="mdot" style="background:#E24B4A"></div><div style="flex:1"><div class="mn">Atorvastatin 20mg</div><div class="ms">Evening · Interaction noted</div></div><div class="mbadge ba">Review</div></div>
+  </div>
+  <div class="nav">
+    <div class="ni on" data-nav="s-home"><div class="ni-ic">&#9638;</div><span>Home</span></div>
+    <div class="ni" data-nav="s-meds"><div class="ni-ic">&#128138;</div><span>Meds</span></div>
+    <div class="ni consult" data-nav="s-chat"><div class="ni-ic">&#128172;</div><span>Consult</span></div>
+    <div class="ni" data-nav="s-mg"><div class="ni-ic">&#129302;</div><span>MedGuide</span></div>
+    <div class="ni" data-nav="s-profile"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- MED LIST -->
+<div class="scr" id="s-meds">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dghdr" style="padding:10px 15px 13px"><div style="font-size:16px;font-weight:500">My medications</div><div style="font-size:11px;opacity:.6">5 active · Updated today</div></div>
+  <div class="search-bar">&#128269; <span>Search medications...</span></div>
+  <div class="fchips"><div class="fc on">All</div><div class="fc off">Morning</div><div class="fc off">Evening</div><div class="fc off">Flagged</div></div>
+  <div style="padding:0 14px;flex:1;overflow:hidden">
+    <div class="med-block" id="btn-ml-met"><div class="cb" style="background:#3B6D11"></div><div class="mbi"><div class="mbn">Metformin 500mg</div><div class="mbs">Twice daily · With food</div></div><div class="mbr"><div class="mbr-v">82%</div><div class="mbr-l">adherence</div></div></div>
+    <div class="med-block" id="btn-ml-lis"><div class="cb" style="background:#1D9E75"></div><div class="mbi"><div class="mbn">Lisinopril 10mg</div><div class="mbs">Once daily · Morning</div></div><div class="mbr"><div class="mbr-v">91%</div><div class="mbr-l">adherence</div></div></div>
+    <div class="med-block" id="btn-ml-ato" style="border-color:#F7C1C1"><div class="cb" style="background:#E24B4A"></div><div class="mbi"><div class="mbn">Atorvastatin 20mg</div><div class="mbs">Once daily · ⚠ Flag</div></div><div class="mbr"><div class="mbr-v" style="color:#A32D2D">75%</div><div class="mbr-l">adherence</div></div></div>
+    <div class="med-block"><div class="cb" style="background:#BA7517"></div><div class="mbi"><div class="mbn">Aspirin 81mg</div><div class="mbs">Once daily · Morning</div></div><div class="mbr"><div class="mbr-v">95%</div><div class="mbr-l">adherence</div></div></div>
+  </div>
+  <div class="g-btn" style="margin:7px 14px 5px">+ Add medication</div>
+  <div class="nav">
+    <div class="ni" data-nav="s-home"><div class="ni-ic">&#9638;</div><span>Home</span></div>
+    <div class="ni on" data-nav="s-meds"><div class="ni-ic">&#128138;</div><span>Meds</span></div>
+    <div class="ni consult" data-nav="s-chat"><div class="ni-ic">&#128172;</div><span>Consult</span></div>
+    <div class="ni" data-nav="s-mg"><div class="ni-ic">&#129302;</div><span>MedGuide</span></div>
+    <div class="ni" data-nav="s-profile"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- MED DETAIL -->
+<div class="scr" id="s-meddet">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="det-top"><div class="back" id="btn-back-det">← My medications</div><div style="font-size:17px;font-weight:500;margin-top:7px" id="det-name">Metformin 500mg</div><div style="font-size:11px;opacity:.65" id="det-sub">Type 2 Diabetes · Oral tablet</div></div>
+  <div class="info-grid">
+    <div class="ig"><div class="ig-l">Dose</div><div class="ig-v" id="det-dose">500mg</div></div>
+    <div class="ig"><div class="ig-l">Frequency</div><div class="ig-v" id="det-freq">Twice daily</div></div>
+    <div class="ig"><div class="ig-l">Instructions</div><div class="ig-v" id="det-instr">With food</div></div>
+    <div class="ig"><div class="ig-l">Refill due</div><div class="ig-v" style="color:#3B6D11" id="det-refill">Apr 5</div></div>
+  </div>
+  <div class="adh-wrap"><div style="font-size:11px;color:#6B7A5E;margin-bottom:5px">Monthly adherence</div><div class="adh-track"><div class="adh-fill" id="det-adh" style="width:82%"></div></div><div style="font-size:11px;color:#3B6D11;font-weight:500;margin-top:3px" id="det-adh-txt">82% · 19 of 23 doses</div></div>
+  <div style="font-size:11px;font-weight:500;color:#6B7A5E;text-transform:uppercase;letter-spacing:.06em;padding:0 13px;margin-bottom:6px">This week</div>
+  <div class="week-row" id="det-week"></div>
+  <div class="g-btn" id="btn-det-pharma" style="margin:0 13px">Talk to a pharmacist</div>
+</div>
+
+<!-- SCANNER -->
+<div class="scr" id="s-scan">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dghdr" style="padding:10px 15px 13px"><div class="back" id="btn-back-scan">← My medications</div><div style="font-size:16px;font-weight:500">Scan label</div><div style="font-size:11px;opacity:.65">Point at your pharmacy vial label</div></div>
+  <div class="scan-vf"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div><div class="scan-line"></div></div>
+  <div style="font-size:11px;color:#6B7A5E;text-align:center;padding:0 14px;margin-bottom:10px">Hold steady · Good lighting · Label in frame</div>
+  <div style="margin:0 14px;background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;padding:11px 13px">
+    <div style="font-size:12px;font-weight:500;color:#1A2E0A;margin-bottom:8px;display:flex;align-items:center;gap:7px">Extracted <span style="font-size:10px;background:#EAF3DE;color:#3B6D11;border-radius:20px;padding:2px 8px">High confidence</span></div>
+    <div class="sr-row"><span class="sr-k">Medication</span><span class="sr-v">Metformin HCl</span></div>
+    <div class="sr-row"><span class="sr-k">Strength</span><span class="sr-v">500mg</span></div>
+    <div class="sr-row"><span class="sr-k">Directions</span><span class="sr-v">Twice daily with food</span></div>
+    <div class="sr-row"><span class="sr-k">Refills</span><span class="sr-v">2 remaining</span></div>
+  </div>
+  <div style="display:flex;gap:8px;margin:10px 14px 0"><div class="g-btn-o" style="flex:1">Re-scan</div><div class="g-btn" style="flex:1">Save to meds</div></div>
+</div>
+
+<!-- OTC -->
+<div class="scr" id="s-otc">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dghdr" style="padding:10px 15px 13px"><div class="back" id="btn-back-otc">← Home</div><div style="font-size:16px;font-weight:500">OTC assistant</div><div style="font-size:11px;opacity:.65">General guidance only · Not a diagnosis</div></div>
+  <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+    <div style="font-size:12px;font-weight:500;color:#1A2E0A">What symptoms are you experiencing?</div>
+    <div class="chips"><div class="chip on">Headache</div><div class="chip on">Runny nose</div><div class="chip off">Sore throat</div><div class="chip off">Cough</div><div class="chip off">Fever</div><div class="chip off">Nausea</div></div>
+    <div style="background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;padding:10px 12px">
+      <div style="font-size:12px;font-weight:500;color:#1A2E0A;margin-bottom:4px">Likely: Common cold</div>
+      <div style="font-size:11px;color:#6B7A5E;margin-bottom:8px;line-height:1.4">OTC options that may help:</div>
+      <div class="otc-rec"><div class="otr-dot"></div><div style="font-size:11px;color:#1A2E0A">Acetaminophen — headache relief</div></div>
+      <div class="otc-rec"><div class="otr-dot"></div><div style="font-size:11px;color:#1A2E0A">Loratadine — runny nose</div></div>
+      <div class="otc-rec"><div class="otr-dot"></div><div style="font-size:11px;color:#1A2E0A">Saline nasal spray — congestion</div></div>
+    </div>
+    <div style="background:#FAEEDA;border:.5px solid #FAC775;border-radius:10px;padding:8px 11px;font-size:10px;color:#633806;line-height:1.4">You take Lisinopril — avoid ibuprofen. Acetaminophen is safer for pain relief.</div>
+    <div class="g-btn" id="btn-otc-pharma" style="margin-top:auto">Talk to a pharmacist</div>
+  </div>
+</div>
+
+<!-- CONSULT -->
+<div class="scr" id="s-chat">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="chat-hdr"><div class="back" id="btn-back-chat">←</div><div class="c-av">RS</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Ravi Sharma, PharmD</div><div style="font-size:10px;opacity:.75">● Available now</div></div><div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:12px">&#128249;</div></div>
+  <div class="chat-msgs" id="pharma-chat">
+    <div class="tchip">Today · 9:38 AM</div>
+    <div class="bbl r"><div class="bt2">Hi Navjot! I can see your medication list. How can I help?</div><div class="bts">9:38 AM</div></div>
+  </div>
+  <div class="chat-in-bar"><input class="chat-in" id="pharma-in" placeholder="Message Dr. Sharma..."/><button class="chat-send" id="pharma-snd">&#8593;</button></div>
+  <div class="nav">
+    <div class="ni" data-nav="s-home"><div class="ni-ic">&#9638;</div><span>Home</span></div>
+    <div class="ni" data-nav="s-meds"><div class="ni-ic">&#128138;</div><span>Meds</span></div>
+    <div class="ni consult on" data-nav="s-chat"><div class="ni-ic">&#128172;</div><span>Consult</span></div>
+    <div class="ni" data-nav="s-mg"><div class="ni-ic">&#129302;</div><span>MedGuide</span></div>
+    <div class="ni" data-nav="s-profile"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- HEALTH -->
+<div class="scr" id="s-health">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dghdr" style="padding:10px 15px 0"><div style="font-size:16px;font-weight:500">Health tracker</div><div style="font-size:11px;opacity:.65">Log and share with your pharmacist</div></div>
+  <div class="ht-tabs"><div class="ht-tab on">Blood pressure</div><div class="ht-tab">Glucose</div><div class="ht-tab">Export</div></div>
+  <div class="ht-body">
+    <div style="background:rgba(255,255,255,.9);border:.5px solid #C0DD97;border-radius:12px;padding:11px 13px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px"><div><span style="font-size:26px;font-weight:500;color:#1A2E0A">124</span><span style="font-size:16px;font-weight:500;color:#1A2E0A">/82</span> <span style="font-size:12px;color:#6B7A5E">mmHg</span></div><div style="font-size:10px;padding:3px 9px;border-radius:20px;background:#EAF3DE;color:#3B6D11">Normal</div></div>
+      <div style="font-size:10px;color:#6B7A5E;margin-bottom:8px">Last logged: Today · 8:12 AM</div>
+      <div class="mini-bars">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-g" style="height:60%;width:100%"></div><div class="mb-d">M</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-g" style="height:75%;width:100%"></div><div class="mb-d">T</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-o" style="height:92%;width:100%"></div><div class="mb-d">W</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-g" style="height:65%;width:100%"></div><div class="mb-d">T</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-g" style="height:70%;width:100%"></div><div class="mb-d">F</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div class="mb mb-g" style="height:58%;width:100%"></div><div class="mb-d">S</div></div>
+      </div>
+    </div>
+    <div class="g-btn">+ Log new reading</div>
+    <div class="hist">
+      <div class="hist-row"><span style="font-size:10px;color:#6B7A5E">Today 8:12 AM</span><span style="font-size:11px;font-weight:500;color:#1A2E0A">124/82</span><span class="hb hb-n">Normal</span></div>
+      <div class="hist-row"><span style="font-size:10px;color:#6B7A5E">Yesterday</span><span style="font-size:11px;font-weight:500;color:#1A2E0A">131/86</span><span class="hb hb-w">Elevated</span></div>
+      <div class="hist-row"><span style="font-size:10px;color:#6B7A5E">Mar 21</span><span style="font-size:11px;font-weight:500;color:#1A2E0A">122/80</span><span class="hb hb-n">Normal</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="scr" id="s-notifs">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dghdr" style="padding:10px 15px 13px"><div class="back" id="btn-back-notifs">← Home</div><div style="font-size:16px;font-weight:500">Notifications</div><div style="font-size:11px;opacity:.65">3 unread</div></div>
+  <div style="padding:11px 14px;flex:1;overflow:hidden">
+    <div class="notif-card warn"><div class="ni-icon2 ni-r">&#9888;</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#1A2E0A">Interaction flagged</div><div style="font-size:10px;color:#6B7A5E;margin-top:2px;line-height:1.4">Atorvastatin + CoQ10 — review with your pharmacist</div></div><div style="font-size:10px;color:#6B7A5E;flex-shrink:0">2m</div></div>
+    <div class="notif-card unread"><div class="ni-icon2 ni-o">&#128138;</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#1A2E0A">Dose reminder</div><div style="font-size:10px;color:#6B7A5E;margin-top:2px">Lisinopril 10mg is due now</div></div><div style="font-size:10px;color:#6B7A5E;flex-shrink:0">9m</div></div>
+    <div class="notif-card unread"><div class="ni-icon2 ni-g">&#128203;</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#1A2E0A">Session summary ready</div><div style="font-size:10px;color:#6B7A5E;margin-top:2px">Your consultation with Dr. Sharma is available</div></div><div style="font-size:10px;color:#6B7A5E;flex-shrink:0">1hr</div></div>
+    <div class="notif-card"><div class="ni-icon2 ni-g">&#128260;</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#1A2E0A">Refill reminder</div><div style="font-size:10px;color:#6B7A5E;margin-top:2px">Metformin refill due in 13 days</div></div><div style="font-size:10px;color:#6B7A5E;flex-shrink:0">Yesterday</div></div>
+    <div class="notif-card"><div class="ni-icon2 ni-g">&#128200;</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:#1A2E0A">Weekly report</div><div style="font-size:10px;color:#6B7A5E;margin-top:2px">Your adherence was 82% last week — great work!</div></div><div style="font-size:10px;color:#6B7A5E;flex-shrink:0">Mar 17</div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="scr" id="s-profile">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="prof-top">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px"><div class="prof-av">NS</div><div><div style="font-size:16px;font-weight:500">Navjot Singh</div><div style="font-size:11px;opacity:.65">M · 47 yrs · California</div></div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><div class="pchip">Type 2 Diabetes</div><div class="pchip">Hypertension</div><div class="pchip">5 meds</div></div>
+  </div>
+  <div style="flex:1;padding:11px 14px;overflow:hidden">
+    <div class="prof-sec">
+      <div class="prof-row" id="btn-prof-meds"><div class="pr-left"><div class="pr-icon">&#128138;</div><div style="font-size:12px;color:#1A2E0A">My medications</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+      <div class="prof-row" id="btn-prof-health"><div class="pr-left"><div class="pr-icon">&#128200;</div><div style="font-size:12px;color:#1A2E0A">Health history</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+      <div class="prof-row" id="btn-prof-consult"><div class="pr-left"><div class="pr-icon">&#128203;</div><div style="font-size:12px;color:#1A2E0A">Consultation history</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+    </div>
+    <div class="prof-sec">
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#127760;</div><div style="font-size:12px;color:#1A2E0A">Language preference</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+      <div class="prof-row" id="btn-prof-notifs"><div class="pr-left"><div class="pr-icon">&#128276;</div><div style="font-size:12px;color:#1A2E0A">Notifications</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#128274;</div><div style="font-size:12px;color:#1A2E0A">Privacy &amp; data</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+    </div>
+    <div class="prof-sec">
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#10067;</div><div style="font-size:12px;color:#1A2E0A">Help &amp; support</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+      <div class="prof-row" id="btn-signout"><div class="pr-left"><div class="pr-icon" style="background:#FCEBEB">&#128682;</div><div style="font-size:12px;color:#A32D2D">Sign out</div></div><div style="font-size:14px;color:#6B7A5E">›</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="ni" data-nav="s-home"><div class="ni-ic">&#9638;</div><span>Home</span></div>
+    <div class="ni" data-nav="s-meds"><div class="ni-ic">&#128138;</div><span>Meds</span></div>
+    <div class="ni consult" data-nav="s-chat"><div class="ni-ic">&#128172;</div><span>Consult</span></div>
+    <div class="ni" data-nav="s-mg"><div class="ni-ic">&#129302;</div><span>MedGuide</span></div>
+    <div class="ni on" data-nav="s-profile"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- MEDGUIDE -->
+<div class="scr" id="s-mg">
+  <div class="sb dg"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="mg-hdr">
+    <div class="mg-orb"><div class="mg-orb-d"></div></div>
+    <div style="flex:1"><div style="font-size:15px;font-weight:500;color:white">AI MedGuide</div><div style="font-size:11px;opacity:.7;color:white">Medication assistant · Educational only</div></div>
+    <div class="mg-bdg">Active</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="sug-area" id="mg-sugs">
+      <div class="sug-lbl">Try asking:</div>
+      <div class="sug-chips">
+        <div class="sug" data-q="Can I take ibuprofen for pain?">Can I take ibuprofen?</div>
+        <div class="sug" data-q="What are the side effects of Metformin?">Metformin side effects?</div>
+        <div class="sug" data-q="Is it safe to skip a dose of Lisinopril?">Skip a dose?</div>
+        <div class="sug" data-q="I have chest tightness after taking my meds">Chest tightness concern</div>
+      </div>
+    </div>
+    <div class="mg-chat" id="mg-chat"><div class="tchip">Today · 9:41 AM</div></div>
+    <div class="disc">AI guidance is educational only. Always confirm with your pharmacist.</div>
+    <div class="qr-row" id="mg-qr" style="display:none"></div>
+    <div class="mg-in-row"><input class="mg-in" id="mg-in" placeholder="Ask about your medications..."/><button class="mg-snd" id="mg-snd">&#8593;</button></div>
+  </div>
+  <div class="nav">
+    <div class="ni" data-nav="s-home"><div class="ni-ic">&#9638;</div><span>Home</span></div>
+    <div class="ni" data-nav="s-meds"><div class="ni-ic">&#128138;</div><span>Meds</span></div>
+    <div class="ni consult" data-nav="s-chat"><div class="ni-ic">&#128172;</div><span>Consult</span></div>
+    <div class="ni on" data-nav="s-mg"><div class="ni-ic">&#129302;</div><span>MedGuide</span></div>
+    <div class="ni" data-nav="s-profile"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const medData={
+  met:{name:"Metformin 500mg",sub:"Type 2 Diabetes · Oral tablet",dose:"500mg",freq:"Twice daily",instr:"With food",refill:"Apr 5",adh:"82%",adhTxt:"82% · 19 of 23 doses",week:[1,1,0,1,1,2,2]},
+  lis:{name:"Lisinopril 10mg",sub:"Hypertension · Oral tablet",dose:"10mg",freq:"Once daily",instr:"Morning",refill:"May 12",adh:"91%",adhTxt:"91% · 21 of 23 doses",week:[1,1,1,1,1,2,2]},
+  ato:{name:"Atorvastatin 20mg",sub:"High Cholesterol · Oral tablet",dose:"20mg",freq:"Once daily",instr:"Evening",refill:"Apr 20",adh:"75%",adhTxt:"75% · 17 of 23 doses",week:[1,0,1,0,1,2,2]}
+};
+const mgR={
+  "Can I take ibuprofen for pain?":{a:"Based on your medications, ibuprofen is not recommended. You take Lisinopril — NSAIDs like ibuprofen can reduce its effectiveness and may affect kidney function.",x:{t:"safe",txt:"Safer alternative: Acetaminophen (Tylenol) is generally safe with Lisinopril for mild-to-moderate pain. Max 3000mg per day."},r:["What dose of Tylenol?","Any other options?","Talk to a pharmacist"]},
+  "What are the side effects of Metformin?":{a:"Common side effects include nausea, stomach upset, and diarrhoea — especially when starting. These usually improve after a few weeks. Taking it with food helps.",x:{t:"safe",txt:"Your profile: Metformin 500mg twice daily with food minimises GI side effects."},r:["When do they go away?","Can I take on empty stomach?","Talk to a pharmacist"]},
+  "Is it safe to skip a dose of Lisinopril?":{a:"Missing an occasional dose is not usually dangerous, but consistency matters for blood pressure control. Take it as soon as you remember unless it is almost time for your next dose.",x:{t:"safe",txt:"Never double up on doses. If you miss more than 2 in a row, contact your pharmacist."},r:["Set a reminder","What if I miss often?","Talk to a pharmacist"]},
+  "I have chest tightness after taking my meds":{a:"Chest tightness can be associated with Lisinopril. ACE inhibitors can occasionally cause a rare reaction called angioedema. This should be reviewed by a healthcare professional promptly.",x:{t:"warn",txt:"This symptom needs pharmacist or doctor review. If you experience difficulty breathing or facial swelling, seek emergency care immediately."},r:["Connect to pharmacist","What is angioedema?"],esc:true}
+};
+const defR={a:"Based on your current medications — Metformin, Lisinopril, and Atorvastatin — I can help with general guidance. For specific medical decisions, always confirm with your licensed pharmacist.",x:{t:"safe",txt:"For personalised advice, connect with a licensed pharmacist in real time."},r:["Talk to a pharmacist","What interactions should I know?"]};
+
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));const el=document.getElementById(id);if(el)el.classList.add('on');}
+function navGo(id){
+  go(id);
+  document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('on',n.getAttribute('data-nav')===id));
+}
+function showMed(key){
+  const d=medData[key];if(!d)return;
+  document.getElementById('det-name').textContent=d.name;
+  document.getElementById('det-sub').textContent=d.sub;
+  document.getElementById('det-dose').textContent=d.dose;
+  document.getElementById('det-freq').textContent=d.freq;
+  document.getElementById('det-instr').textContent=d.instr;
+  document.getElementById('det-refill').textContent=d.refill;
+  document.getElementById('det-adh').style.width=d.adh;
+  document.getElementById('det-adh-txt').textContent=d.adhTxt;
+  const wr=document.getElementById('det-week');wr.innerHTML='';
+  ['M','T','W','T','F','S','S'].forEach((day,i)=>{
+    const v=d.week[i];const cl=v===1?'wt':v===0?'wm':'wu';const sym=v===1?'✓':v===0?'✗':'–';
+    wr.innerHTML+=`<div class="wd"><div class="wd-d">${day}</div><div class="wd-dot ${cl}">${sym}</div></div>`;
+  });
+  go('s-meddet');
+}
+document.querySelectorAll('[data-nav]').forEach(n=>n.addEventListener('click',()=>navGo(n.getAttribute('data-nav'))));
+document.getElementById('btn-register').addEventListener('click',()=>go('s-ob1'));
+document.getElementById('btn-signin').addEventListener('click',()=>navGo('s-home'));
+document.getElementById('btn-ob1').addEventListener('click',()=>go('s-ob3'));
+document.getElementById('btn-ob3').addEventListener('click',()=>navGo('s-home'));
+document.getElementById('btn-hm-met').addEventListener('click',()=>showMed('met'));
+document.getElementById('btn-hm-lis').addEventListener('click',()=>showMed('lis'));
+document.getElementById('btn-hm-ato').addEventListener('click',()=>showMed('ato'));
+document.getElementById('btn-ml-met').addEventListener('click',()=>showMed('met'));
+document.getElementById('btn-ml-lis').addEventListener('click',()=>showMed('lis'));
+document.getElementById('btn-ml-ato').addEventListener('click',()=>showMed('ato'));
+document.getElementById('btn-back-det').addEventListener('click',()=>navGo('s-meds'));
+document.getElementById('btn-back-scan').addEventListener('click',()=>navGo('s-meds'));
+document.getElementById('btn-back-otc').addEventListener('click',()=>navGo('s-home'));
+document.getElementById('btn-back-chat').addEventListener('click',()=>navGo('s-home'));
+document.getElementById('btn-back-notifs').addEventListener('click',()=>navGo('s-home'));
+document.getElementById('btn-det-pharma').addEventListener('click',()=>navGo('s-chat'));
+document.getElementById('btn-otc-pharma').addEventListener('click',()=>navGo('s-chat'));
+document.getElementById('btn-prof-meds').addEventListener('click',()=>navGo('s-meds'));
+document.getElementById('btn-prof-health').addEventListener('click',()=>go('s-health'));
+document.getElementById('btn-prof-consult').addEventListener('click',()=>navGo('s-chat'));
+document.getElementById('btn-prof-notifs').addEventListener('click',()=>go('s-notifs'));
+document.getElementById('btn-signout').addEventListener('click',()=>go('s-splash'));
+const pharmaReplies=["Got it, thank you Dr. Sharma.","Can you explain more about that?","Should I see my doctor about this?","What about my other medications?","That makes sense, thank you."];
+let pi=0;
+function sendPharma(){
+  const inp=document.getElementById('pharma-in');const v=inp.value.trim();if(!v)return;inp.value='';
+  const chat=document.getElementById('pharma-chat');
+  const uw=document.createElement('div');uw.className='bbl s';uw.innerHTML=`<div class="bt2">${v}</div><div class="bts">Just now</div>`;
+  chat.appendChild(uw);chat.scrollTop=chat.scrollHeight;
+  setTimeout(()=>{
+    const rw=document.createElement('div');rw.className='bbl r';rw.innerHTML=`<div class="bt2">${pharmaReplies[pi%pharmaReplies.length]}</div><div class="bts">Just now</div>`;
+    pi++;chat.appendChild(rw);chat.scrollTop=chat.scrollHeight;
+  },1100);
+}
+document.getElementById('pharma-snd').addEventListener('click',sendPharma);
+document.getElementById('pharma-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendPharma();});
+function mgSend(text){
+  document.getElementById('mg-sugs').style.display='none';
+  const chat=document.getElementById('mg-chat');
+  const qr=document.getElementById('mg-qr');qr.style.display='none';qr.innerHTML='';
+  const uw=document.createElement('div');uw.className='ub-w';uw.innerHTML=`<div class="ub">${text}</div><div class="ut">Just now</div>`;chat.appendChild(uw);
+  const tw=document.createElement('div');tw.className='ab-w';tw.innerHTML=`<div class="ab-av"><div class="ab-av-d"></div></div><div class="ab" style="padding:6px 10px"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;chat.appendChild(tw);chat.scrollTop=chat.scrollHeight;
+  const r=mgR[text]||defR;
+  setTimeout(()=>{
+    chat.removeChild(tw);
+    const aw=document.createElement('div');aw.className='ab-w';aw.innerHTML=`<div class="ab-av"><div class="ab-av-d"></div></div><div><div class="ab">${r.a}</div><div class="ab-t">Just now</div></div>`;chat.appendChild(aw);
+    if(r.x){const xc=document.createElement('div');xc.className=r.x.t==='warn'?'warn-c':'src-c';xc.textContent=r.x.txt;chat.appendChild(xc);}
+    if(r.esc){const ec=document.createElement('div');ec.className='esc-c';ec.innerHTML='<div class="esc-t">Connect to a pharmacist now</div><div class="esc-s">A licensed pharmacist is available</div>';ec.addEventListener('click',()=>navGo('s-chat'));chat.appendChild(ec);}
+    chat.scrollTop=chat.scrollHeight;
+    if(r.r){qr.style.display='flex';r.r.forEach(rep=>{const q=document.createElement('div');q.className='qr';q.textContent=rep;q.addEventListener('click',()=>{if(rep.includes('pharmacist'))navGo('s-chat');else mgSend(rep);});qr.appendChild(q);});}
+  },1300);
+}
+document.getElementById('mg-snd').addEventListener('click',()=>{const v=document.getElementById('mg-in').value.trim();if(v){document.getElementById('mg-in').value='';mgSend(v);}});
+document.getElementById('mg-in').addEventListener('keydown',e=>{if(e.key==='Enter'){const v=e.target.value.trim();if(v){e.target.value='';mgSend(v);}}});
+document.querySelectorAll('.sug').forEach(s=>s.addEventListener('click',()=>mgSend(s.getAttribute('data-q'))));
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{c.classList.toggle('on');c.classList.toggle('off');}));
+document.querySelectorAll('.ht-tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.ht-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');}));
+</script>
+</body>
+</html>

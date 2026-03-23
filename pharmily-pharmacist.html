@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmily — Pharmacist App Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0D1F2D;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.page-title{color:rgba(255,255,255,.4);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;}
+.phone-outer{width:320px;}
+.frame{background:#1A1A1A;border-radius:44px;padding:12px;box-shadow:0 40px 80px rgba(0,0,0,.7);}
+.phone{border-radius:34px;overflow:hidden;height:640px;display:flex;flex-direction:column;position:relative;background:#F2F6F7;}
+.screens{position:relative;flex:1;overflow:hidden;}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s;background:#F2F6F7;}
+.scr.on{opacity:1;pointer-events:all;}
+.sb{display:flex;justify-content:space-between;padding:9px 16px 2px;font-size:11px;}
+.sb.dt{background:#085041;color:rgba(255,255,255,.65);}
+
+/* Palette: deep teal */
+.teal-hdr{background:#085041;color:white;}
+.t-btn{background:#0F6E56;color:white;border-radius:12px;padding:11px 14px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;}
+.t-btn:hover{background:#085041;}
+.t-btn-o{background:#E1F5EE;color:#085041;border:.5px solid #9FE1CB;border-radius:12px;padding:11px 14px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;}
+.card{background:white;border:.5px solid #9FE1CB;border-radius:13px;padding:10px 12px;}
+.slbl{font-size:10px;font-weight:500;color:#5A7269;text-transform:uppercase;letter-spacing:.06em;padding:0 15px;margin-bottom:8px;}
+.back{font-size:16px;color:rgba(255,255,255,.75);cursor:pointer;padding:2px 4px;}
+
+/* NAV — 5 tabs, Queue centre */
+.nav{display:flex;justify-content:space-around;align-items:center;padding:8px 4px 12px;background:rgba(255,255,255,.97);border-top:.5px solid #9FE1CB;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#5A7269;cursor:pointer;flex:1;transition:color .15s;}
+.ni.on{color:#0F6E56;}
+.ni-ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.ni.on .ni-ic{background:#E1F5EE;}
+.ni.queue-tab{color:#085041;font-weight:500;}
+.ni.queue-tab.on{color:#0F6E56;}
+.ni.queue-tab.on .ni-ic{background:#0F6E56;color:white;}
+
+/* ── SPLASH ── */
+#s-splash{background:#085041;background-image:none;}
+.splash-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#085041;}
+.slogo{font-size:34px;font-weight:600;color:white;letter-spacing:-1px;}
+.slogo span{color:#5DCAA5;}
+.srole{font-size:13px;font-weight:500;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:20px;padding:4px 14px;margin:10px 0 6px;display:inline-block;}
+.stag{font-size:12px;color:rgba(255,255,255,.55);text-align:center;margin:0 0 30px;line-height:1.7;}
+.sbtn{width:100%;background:white;color:#085041;border-radius:14px;padding:14px;text-align:center;font-size:14px;font-weight:600;margin-bottom:11px;cursor:pointer;transition:opacity .15s;}
+.sbtn:hover{opacity:.9;}
+.sbtn.o{background:rgba(255,255,255,.15);color:white;border:.5px solid rgba(255,255,255,.3);}
+.sdots{display:flex;gap:6px;margin-top:22px;}
+.sd{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);}
+.sd.on{width:18px;border-radius:4px;background:white;}
+
+/* ── DASHBOARD ── */
+.dash-top{background:#085041;color:white;padding:12px 16px 16px;}
+.dash-top .greet{font-size:12px;opacity:.7;}
+.dash-top .name{font-size:19px;font-weight:500;}
+.dash-top .sub{font-size:11px;opacity:.6;margin-top:1px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;}
+.stat-card{background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:11px 13px;}
+.stat-card.accent{background:#0F6E56;border-color:#0F6E56;}
+.stat-v{font-size:26px;font-weight:500;color:#04342C;}
+.stat-card.accent .stat-v{color:white;}
+.stat-l{font-size:10px;color:#5A7269;margin-top:2px;}
+.stat-card.accent .stat-l{color:rgba(255,255,255,.75);}
+.stat-d{font-size:10px;margin-top:4px;}
+.stat-d.up{color:#0F6E56;}
+.stat-d.dn{color:#A32D2D;}
+.stat-card.accent .stat-d{color:rgba(255,255,255,.65);}
+.recent-list{padding:0 14px;display:flex;flex-direction:column;gap:7px;}
+.recent-item{display:flex;align-items:center;gap:10px;background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:9px 11px;cursor:pointer;transition:background .15s;}
+.recent-item:hover{background:#F2F6F7;}
+.r-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.r-av.a{background:#E1F5EE;color:#085041;}
+.r-av.b{background:#E6F1FB;color:#185FA5;}
+.r-av.c{background:#FAEEDA;color:#854F0B;}
+.r-inf{flex:1;}
+.r-n{font-size:12px;font-weight:500;color:#04342C;}
+.r-s{font-size:10px;color:#5A7269;}
+.r-time{font-size:10px;color:#5A7269;flex-shrink:0;}
+
+/* ── QUEUE ── */
+.q-top{background:#085041;color:white;padding:12px 16px 16px;}
+.q-stats{display:flex;gap:7px;padding:12px 14px 10px;}
+.qs{flex:1;background:white;border:.5px solid #9FE1CB;border-radius:11px;padding:9px 10px;text-align:center;}
+.qs-v{font-size:20px;font-weight:500;color:#085041;}
+.qs-l{font-size:9px;color:#5A7269;margin-top:1px;}
+.q-list{padding:0 14px;display:flex;flex-direction:column;gap:8px;flex:1;overflow:hidden;}
+.q-card{display:flex;align-items:center;gap:10px;background:white;border:.5px solid #9FE1CB;border-radius:13px;padding:10px 12px;cursor:pointer;transition:background .15s;}
+.q-card:hover{background:#F2F6F7;}
+.q-card.urgent{border-color:#F7C1C1;border-left:3px solid #E24B4A;}
+.q-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;}
+.qa{background:#E1F5EE;color:#085041;}
+.qb{background:#E6F1FB;color:#185FA5;}
+.qc{background:#FAEEDA;color:#854F0B;}
+.q-inf{flex:1;}
+.q-n{font-size:12px;font-weight:500;color:#04342C;}
+.q-r{font-size:10px;color:#5A7269;margin-top:1px;}
+.q-meta{text-align:right;}
+.q-time{font-size:10px;color:#5A7269;}
+.q-urg{font-size:9px;padding:2px 7px;border-radius:20px;margin-top:3px;}
+.urg-now{background:#FCEBEB;color:#A32D2D;}
+.urg-soon{background:#FAEEDA;color:#854F0B;}
+.urg-ok{background:#E1F5EE;color:#085041;}
+
+/* ── PATIENT CONTEXT ── */
+.pt-top{background:#085041;color:white;padding:11px 14px 15px;display:flex;align-items:center;gap:11px;}
+.pt-av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;flex-shrink:0;}
+.pt-inf{flex:1;}
+.pt-n{font-size:15px;font-weight:500;}
+.pt-s{font-size:11px;opacity:.7;margin-top:1px;}
+.pt-quick{display:flex;gap:7px;padding:11px 14px 10px;}
+.ptq{flex:1;background:white;border:.5px solid #9FE1CB;border-radius:11px;padding:9px 10px;text-align:center;}
+.ptq-v{font-size:15px;font-weight:500;color:#085041;}
+.ptq-l{font-size:9px;color:#5A7269;}
+.flag-card{margin:0 14px 10px;background:#FAEEDA;border:.5px solid #FAC775;border-radius:11px;padding:9px 12px;}
+.flag-t{font-size:11px;font-weight:500;color:#854F0B;margin-bottom:3px;}
+.flag-b{font-size:10px;color:#633806;line-height:1.5;}
+.med-sec{padding:0 14px;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
+.rx-med{display:flex;align-items:center;gap:9px;background:white;border:.5px solid #9FE1CB;border-radius:11px;padding:9px 11px;}
+.rx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.rx-mn{font-size:12px;font-weight:500;color:#04342C;flex:1;}
+.rx-ms{font-size:10px;color:#5A7269;}
+.rx-adh{font-size:11px;font-weight:500;color:#0F6E56;}
+.rx-act-row{display:flex;gap:8px;padding:10px 14px 0;}
+
+/* ── ACTIVE CONSULT ── */
+.consult-hdr{background:#085041;color:white;padding:10px 14px 12px;display:flex;align-items:center;gap:9px;}
+.c-av{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;}
+.c-inf{flex:1;}
+.c-n{font-size:13px;font-weight:500;}
+.c-s{font-size:10px;opacity:.75;}
+.c-btn{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.consult-msgs{flex:1;padding:11px 12px 8px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;}
+.tchip{align-self:center;font-size:9px;color:#5A7269;background:rgba(159,225,203,.4);border-radius:20px;padding:2px 9px;}
+.bbl{max-width:80%;}
+.bbl.r .bt2{background:white;border:.5px solid #9FE1CB;border-radius:4px 12px 12px 12px;color:#04342C;}
+.bbl.s{align-self:flex-end;}
+.bbl.s .bt2{background:#0F6E56;border-radius:12px 4px 12px 12px;color:white;}
+.bt2{padding:7px 10px;font-size:12px;line-height:1.5;}
+.bts{font-size:9px;color:#5A7269;margin-top:2px;padding:0 3px;}
+.bbl.s .bts{text-align:right;}
+.flag-bub{background:rgba(250,238,218,.96);border:.5px solid #FAC775;border-radius:10px;padding:8px 10px;}
+.flag-bub-t{font-size:10px;font-weight:500;color:#854F0B;margin-bottom:2px;}
+.flag-bub-b{font-size:10px;color:#633806;line-height:1.4;}
+.note-area{background:white;border-top:.5px solid #9FE1CB;padding:8px 12px;}
+.note-lbl{font-size:9px;color:#5A7269;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.note-field{background:#F2F6F7;border:.5px solid #9FE1CB;border-radius:9px;padding:7px 10px;font-size:11px;color:#04342C;line-height:1.5;margin-bottom:7px;}
+.consult-in-row{display:flex;gap:6px;align-items:center;}
+.consult-in{flex:1;background:#F2F6F7;border:.5px solid #9FE1CB;border-radius:22px;padding:7px 12px;font-size:11px;color:#04342C;outline:none;font-family:inherit;}
+.consult-in::placeholder{color:#9AADA8;}
+.consult-snd{width:30px;height:30px;border-radius:50%;background:#0F6E56;color:white;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border:none;flex-shrink:0;}
+.consult-snd:hover{background:#085041;}
+.typing{display:flex;gap:4px;align-items:center;padding:7px 10px;}
+.td{width:7px;height:7px;border-radius:50%;background:#9FE1CB;animation:bnc .9s infinite;}
+.td:nth-child(2){animation-delay:.2s;}
+.td:nth-child(3){animation-delay:.4s;}
+@keyframes bnc{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* ── MTM NOTES ── */
+.mtm-top{background:#085041;color:white;padding:11px 14px 14px;}
+.mtm-body{flex:1;padding:11px 14px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;}
+.mtm-card{background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:11px 13px;}
+.mtm-ct{font-size:10px;font-weight:500;color:#085041;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+.mtm-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid #E1F5EE;}
+.mtm-row:last-child{border-bottom:none;}
+.mtm-l{font-size:11px;color:#5A7269;}
+.mtm-v{font-size:11px;font-weight:500;color:#04342C;}
+.mtm-note{background:#F2F6F7;border:.5px solid #9FE1CB;border-radius:9px;padding:8px 10px;font-size:11px;color:#04342C;line-height:1.5;margin-top:7px;width:100%;resize:none;outline:none;font-family:inherit;}
+.cpt-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+.cpt{font-size:10px;padding:4px 10px;border-radius:20px;background:#E1F5EE;color:#085041;border:.5px solid #9FE1CB;cursor:pointer;}
+.cpt.on{background:#085041;color:white;border-color:#085041;}
+.mtm-actions{display:flex;gap:8px;}
+.typing-dots{display:flex;gap:3px;padding:2px 0;}
+
+/* ── MED REVIEW ── */
+.medrev-top{background:#085041;color:white;padding:11px 14px 14px;display:flex;align-items:center;gap:10px;}
+.medrev-body{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+.med-rev-card{background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:10px 12px;cursor:pointer;transition:background .15s;}
+.med-rev-card:hover{background:#F2F6F7;}
+.med-rev-card.flagged{border-color:#F7C1C1;border-left:3px solid #E24B4A;}
+.mrc-top{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.mrc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.mrc-n{font-size:13px;font-weight:500;color:#04342C;flex:1;}
+.mrc-adh{font-size:12px;font-weight:500;}
+.adh-g{color:#0F6E56;}
+.adh-r{color:#A32D2D;}
+.adh-track{height:5px;background:#9FE1CB;border-radius:3px;overflow:hidden;margin-bottom:5px;}
+.adh-fill{height:100%;background:#0F6E56;border-radius:3px;}
+.adh-fill.low{background:#E24B4A;}
+.mrc-details{display:flex;gap:8px;}
+.mrc-d{font-size:10px;color:#5A7269;}
+.week-mini{display:flex;gap:3px;margin-top:5px;}
+.wm{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;}
+.wmt{background:#0F6E56;color:white;}
+.wmm{background:#FCEBEB;color:#A32D2D;}
+.wmu{background:#E1F5EE;color:#5A7269;}
+
+/* ── SESSION HISTORY ── */
+.hist-top{background:#085041;color:white;padding:11px 14px 14px;}
+.hist-filters{display:flex;gap:6px;padding:10px 14px 8px;overflow:hidden;}
+.hf{font-size:10px;padding:4px 11px;border-radius:20px;border:.5px solid #9FE1CB;cursor:pointer;}
+.hf.on{background:#0F6E56;color:white;border-color:#0F6E56;}
+.hf.off{background:white;color:#5A7269;}
+.hist-list{padding:0 14px;display:flex;flex-direction:column;gap:7px;flex:1;overflow:hidden;}
+.hist-item{background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:10px 12px;cursor:pointer;transition:background .15s;}
+.hist-item:hover{background:#F2F6F7;}
+.hi-top{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
+.hi-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.hi-n{font-size:12px;font-weight:500;color:#04342C;flex:1;}
+.hi-date{font-size:10px;color:#5A7269;}
+.hi-reason{font-size:10px;color:#5A7269;margin-bottom:4px;}
+.hi-tags{display:flex;gap:5px;}
+.hi-tag{font-size:9px;padding:2px 7px;border-radius:20px;background:#E1F5EE;color:#085041;}
+.hi-tag.mtm{background:#E6F1FB;color:#185FA5;}
+.hi-tag.flag{background:#FCEBEB;color:#A32D2D;}
+
+/* ── PROFILE ── */
+.prof-top{background:#085041;color:white;padding:12px 15px 17px;}
+.prof-av{width:46px;height:46px;border-radius:50%;background:#0F6E56;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;color:white;}
+.pchip{font-size:10px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);}
+.prof-sec{background:white;border:.5px solid #9FE1CB;border-radius:12px;overflow:hidden;margin-bottom:7px;}
+.prof-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:.5px solid #E1F5EE;cursor:pointer;transition:background .15s;}
+.prof-row:hover{background:#F2F6F7;}
+.prof-row:last-child{border-bottom:none;}
+.pr-left{display:flex;align-items:center;gap:9px;}
+.pr-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;background:#E1F5EE;}
+.avail-toggle{display:flex;align-items:center;gap:8px;background:white;border:.5px solid #9FE1CB;border-radius:12px;padding:11px 14px;margin:0 14px 10px;}
+.toggle-dot{width:12px;height:12px;border-radius:50%;background:#0F6E56;flex-shrink:0;}
+.toggle-dot.off{background:#B4B2A9;}
+.toggle-lbl{flex:1;font-size:12px;font-weight:500;color:#04342C;}
+.toggle-sub{font-size:10px;color:#5A7269;}
+.toggle-btn{background:#0F6E56;color:white;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="page-title">Pharmily · Pharmacist App Demo</div>
+<div class="phone-outer">
+<div class="frame">
+<div class="phone">
+<div class="screens">
+
+<!-- SPLASH -->
+<div class="scr on" id="s-splash" style="background:#085041;background-image:none;">
+  <div class="splash-inner">
+    <div class="slogo">Pharmi<span>ly</span></div>
+    <div class="srole">Pharmacist Portal</div>
+    <div class="stag">Manage consultations, review patients<br>and document MTM sessions.</div>
+    <div class="sbtn" id="btn-signin">Sign in as Dr. Sharma</div>
+    <div class="sbtn o">Use a different account</div>
+    <div class="sdots"><div class="sd on"></div><div class="sd"></div><div class="sd"></div></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="scr" id="s-dash">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="dash-top">
+    <div class="greet">Welcome back,</div>
+    <div class="name">Dr. Ravi Sharma</div>
+    <div class="sub">PharmD · California · Monday, Mar 23</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card accent"><div class="stat-v">3</div><div class="stat-l">In queue now</div><div class="stat-d">1 urgent</div></div>
+    <div class="stat-card"><div class="stat-v" style="color:#085041">12</div><div class="stat-l">Consults today</div><div class="stat-d up">↑ 3 vs yesterday</div></div>
+    <div class="stat-card"><div class="stat-v" style="color:#085041">7</div><div class="stat-l">MTM sessions</div><div class="stat-d up">This month</div></div>
+    <div class="stat-card"><div class="stat-v" style="color:#085041">94%</div><div class="stat-l">Patient satisfaction</div><div class="stat-d dn" style="color:#A32D2D">↓ 1pt</div></div>
+  </div>
+  <div class="slbl">Recent patients</div>
+  <div class="recent-list">
+    <div class="recent-item" id="btn-dash-ns"><div class="r-av a">NS</div><div class="r-inf"><div class="r-n">Navjot Singh</div><div class="r-s">Drug interaction · Atorvastatin</div></div><div class="r-time">2m ago</div></div>
+    <div class="recent-item" id="btn-dash-pk"><div class="r-av b">PK</div><div class="r-inf"><div class="r-n">Priya Kaur</div><div class="r-s">Missed dose guidance</div></div><div class="r-time">11m ago</div></div>
+    <div class="recent-item" id="btn-dash-mr"><div class="r-av c">MR</div><div class="r-inf"><div class="r-n">Maria Rodriguez</div><div class="r-s">OTC recommendation</div></div><div class="r-time">18m ago</div></div>
+  </div>
+  <div class="nav">
+    <div class="ni on" data-nav="s-dash"><div class="ni-ic">&#9638;</div><span>Dashboard</span></div>
+    <div class="ni queue-tab" data-nav="s-queue"><div class="ni-ic">&#128203;</div><span>Queue</span></div>
+    <div class="ni" data-nav="s-hist"><div class="ni-ic">&#128196;</div><span>History</span></div>
+    <div class="ni" data-nav="s-prof"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- QUEUE -->
+<div class="scr" id="s-queue">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="teal-hdr" style="padding:11px 15px 13px">
+    <div style="font-size:16px;font-weight:500">Consultation queue</div>
+    <div style="font-size:11px;opacity:.65">3 patients waiting</div>
+  </div>
+  <div class="q-stats">
+    <div class="qs"><div class="qs-v">3</div><div class="qs-l">Waiting</div></div>
+    <div class="qs"><div class="qs-v">1</div><div class="qs-l">Urgent</div></div>
+    <div class="qs"><div class="qs-v">12</div><div class="qs-l">Today total</div></div>
+  </div>
+  <div class="q-list">
+    <div class="q-card urgent" id="btn-q-ns"><div class="q-av qa">NS</div><div class="q-inf"><div class="q-n">Navjot Singh</div><div class="q-r">Drug interaction question · Atorvastatin</div></div><div class="q-meta"><div class="q-time">2 min ago</div><div class="q-urg urg-now">Urgent</div></div></div>
+    <div class="q-card" id="btn-q-pk"><div class="q-av qb">PK</div><div class="q-inf"><div class="q-n">Priya Kaur</div><div class="q-r">Missed dose guidance · Metformin</div></div><div class="q-meta"><div class="q-time">11 min ago</div><div class="q-urg urg-soon">Soon</div></div></div>
+    <div class="q-card" id="btn-q-mr"><div class="q-av qc">MR</div><div class="q-inf"><div class="q-n">Maria Rodriguez</div><div class="q-r">OTC recommendation for cold</div></div><div class="q-meta"><div class="q-time">18 min ago</div><div class="q-urg urg-ok">Routine</div></div></div>
+  </div>
+  <div class="nav">
+    <div class="ni" data-nav="s-dash"><div class="ni-ic">&#9638;</div><span>Dashboard</span></div>
+    <div class="ni queue-tab on" data-nav="s-queue"><div class="ni-ic">&#128203;</div><span>Queue</span></div>
+    <div class="ni" data-nav="s-hist"><div class="ni-ic">&#128196;</div><span>History</span></div>
+    <div class="ni" data-nav="s-prof"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- PATIENT CONTEXT -->
+<div class="scr" id="s-ptctx">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="pt-top">
+    <div class="back" id="btn-back-ptctx">←</div>
+    <div class="pt-av" id="pt-av-lbl">NS</div>
+    <div class="pt-inf">
+      <div class="pt-n" id="pt-ctx-name">Navjot Singh</div>
+      <div class="pt-s" id="pt-ctx-sub">M · 47 yrs · Type 2 Diabetes, Hypertension</div>
+    </div>
+  </div>
+  <div class="pt-quick">
+    <div class="ptq"><div class="ptq-v" id="ptq-meds">5</div><div class="ptq-l">Meds</div></div>
+    <div class="ptq"><div class="ptq-v" id="ptq-adh">82%</div><div class="ptq-l">Adherence</div></div>
+    <div class="ptq"><div class="ptq-v" id="ptq-flags">1</div><div class="ptq-l">Flag</div></div>
+    <div class="ptq"><div class="ptq-v" id="ptq-consults">7</div><div class="ptq-l">Consults</div></div>
+  </div>
+  <div class="flag-card" id="pt-flag-card">
+    <div class="flag-t" id="pt-flag-t">⚠ Interaction flag · Review before consult</div>
+    <div class="flag-b" id="pt-flag-b">Atorvastatin + CoQ10 supplement — minor interaction, timing-based. Patient asking for guidance.</div>
+  </div>
+  <div class="slbl">Medication list</div>
+  <div class="med-sec" id="pt-med-sec">
+    <div class="rx-med"><div class="rx-dot" style="background:#0F6E56"></div><div style="flex:1"><div class="rx-mn">Metformin 500mg · Twice daily</div><div class="rx-ms">With food · Dr. Chen</div></div><div class="rx-adh">82%</div></div>
+    <div class="rx-med"><div class="rx-dot" style="background:#0F6E56"></div><div style="flex:1"><div class="rx-mn">Lisinopril 10mg · Once daily</div><div class="rx-ms">Morning · Dr. Chen</div></div><div class="rx-adh">91%</div></div>
+    <div class="rx-med"><div class="rx-dot" style="background:#EF9F27"></div><div style="flex:1"><div class="rx-mn">Atorvastatin 20mg · Once daily</div><div class="rx-ms">Evening · + CoQ10 flag</div></div><div class="rx-adh" style="color:#BA7517">75%</div></div>
+  </div>
+  <div class="rx-act-row">
+    <div class="t-btn" id="btn-start-consult" style="flex:1">Start chat</div>
+    <div class="t-btn-o" id="btn-medrev" style="flex:1">Med review</div>
+  </div>
+</div>
+
+<!-- ACTIVE CONSULT -->
+<div class="scr" id="s-consult">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="consult-hdr">
+    <div class="back" id="btn-back-consult">←</div>
+    <div class="c-av" id="consult-av">NS</div>
+    <div class="c-inf">
+      <div class="c-n" id="consult-pname">Navjot Singh</div>
+      <div class="c-s">Active · <span id="consult-timer">0:00</span></div>
+    </div>
+    <div class="c-btn">&#128249;</div>
+  </div>
+  <div class="consult-msgs" id="consult-msgs">
+    <div class="tchip">Session started · 9:38 AM</div>
+    <div class="bbl r"><div class="bt2">Hi — I started taking CoQ10 and got a flag. Should I stop?</div><div class="bts">9:38 AM</div></div>
+  </div>
+  <div class="note-area">
+    <div class="note-lbl">Session note (auto-saved)</div>
+    <textarea class="mtm-note" id="session-note" rows="2" placeholder="Document this consultation...">Patient counselled on Atorvastatin + CoQ10 minor interaction.</textarea>
+    <div class="consult-in-row">
+      <input class="consult-in" id="consult-in" placeholder="Reply to patient..."/>
+      <button class="consult-snd" id="consult-snd">&#8593;</button>
+    </div>
+  </div>
+</div>
+
+<!-- MTM NOTES -->
+<div class="scr" id="s-mtm">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="mtm-top">
+    <div class="back" id="btn-back-mtm">← Navjot Singh</div>
+    <div style="font-size:16px;font-weight:500;margin-top:6px">MTM session note</div>
+    <div style="font-size:11px;opacity:.7">Medication Therapy Management · Mar 23, 2026</div>
+  </div>
+  <div class="mtm-body">
+    <div class="mtm-card">
+      <div class="mtm-ct">Session details</div>
+      <div class="mtm-row"><span class="mtm-l">Patient</span><span class="mtm-v">Navjot Singh</span></div>
+      <div class="mtm-row"><span class="mtm-l">Duration</span><span class="mtm-v">12 min</span></div>
+      <div class="mtm-row"><span class="mtm-l">Mode</span><span class="mtm-v">Chat → Video</span></div>
+      <div class="mtm-row"><span class="mtm-l">Pharmacist</span><span class="mtm-v">Ravi Sharma, PharmD</span></div>
+    </div>
+    <div class="mtm-card">
+      <div class="mtm-ct">Clinical summary</div>
+      <textarea class="mtm-note" rows="3">Patient counselled on Atorvastatin + CoQ10 minor interaction. Advised 2hr separation. Adherence reviewed — 1 missed Metformin dose Wednesday. Reinforced importance of consistent timing with meals.</textarea>
+    </div>
+    <div class="mtm-card">
+      <div class="mtm-ct">CPT / billing code</div>
+      <div class="cpt-chips">
+        <div class="cpt on" onclick="this.classList.toggle('on')">99605 — Initial MTM</div>
+        <div class="cpt" onclick="this.classList.toggle('on')">99606</div>
+        <div class="cpt" onclick="this.classList.toggle('on')">99607</div>
+      </div>
+    </div>
+    <div class="mtm-actions">
+      <div class="t-btn-o" style="flex:1">Save draft</div>
+      <div class="t-btn" id="btn-mtm-submit" style="flex:1">Submit &amp; close</div>
+    </div>
+  </div>
+</div>
+
+<!-- MED REVIEW -->
+<div class="scr" id="s-medrev">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="medrev-top">
+    <div class="back" id="btn-back-medrev">←</div>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:500">Navjot Singh — Med review</div>
+      <div style="font-size:11px;opacity:.7">5 medications · Last updated today</div>
+    </div>
+  </div>
+  <div class="medrev-body">
+    <div class="med-rev-card">
+      <div class="mrc-top"><div class="mrc-dot" style="background:#0F6E56"></div><div class="mrc-n">Metformin 500mg</div><div class="mrc-adh adh-g">82%</div></div>
+      <div class="adh-track"><div class="adh-fill" style="width:82%"></div></div>
+      <div class="mrc-details"><div class="mrc-d">Twice daily · With food</div><div class="mrc-d">19 of 23 doses</div></div>
+      <div class="week-mini">
+        <div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmm">✗</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmu">–</div><div class="wm wmu">–</div>
+      </div>
+    </div>
+    <div class="med-rev-card">
+      <div class="mrc-top"><div class="mrc-dot" style="background:#0F6E56"></div><div class="mrc-n">Lisinopril 10mg</div><div class="mrc-adh adh-g">91%</div></div>
+      <div class="adh-track"><div class="adh-fill" style="width:91%"></div></div>
+      <div class="mrc-details"><div class="mrc-d">Once daily · Morning</div><div class="mrc-d">21 of 23 doses</div></div>
+      <div class="week-mini">
+        <div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmu">–</div><div class="wm wmu">–</div>
+      </div>
+    </div>
+    <div class="med-rev-card flagged">
+      <div class="mrc-top"><div class="mrc-dot" style="background:#E24B4A"></div><div class="mrc-n">Atorvastatin 20mg</div><div class="mrc-adh adh-r">75%</div></div>
+      <div class="adh-track"><div class="adh-fill low" style="width:75%"></div></div>
+      <div class="mrc-details"><div class="mrc-d">Once daily · Evening · ⚠ CoQ10 flag</div><div class="mrc-d">17 of 23 doses</div></div>
+      <div class="week-mini">
+        <div class="wm wmt">✓</div><div class="wm wmm">✗</div><div class="wm wmt">✓</div><div class="wm wmm">✗</div><div class="wm wmt">✓</div><div class="wm wmu">–</div><div class="wm wmu">–</div>
+      </div>
+    </div>
+    <div class="med-rev-card">
+      <div class="mrc-top"><div class="mrc-dot" style="background:#EF9F27"></div><div class="mrc-n">Aspirin 81mg</div><div class="mrc-adh adh-g">95%</div></div>
+      <div class="adh-track"><div class="adh-fill" style="width:95%"></div></div>
+      <div class="mrc-details"><div class="mrc-d">Once daily · Morning</div><div class="mrc-d">22 of 23 doses</div></div>
+      <div class="week-mini">
+        <div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmt">✓</div><div class="wm wmu">–</div><div class="wm wmu">–</div>
+      </div>
+    </div>
+    <div class="t-btn" id="btn-goto-mtm">Create MTM note</div>
+  </div>
+</div>
+
+<!-- SESSION HISTORY -->
+<div class="scr" id="s-hist">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="teal-hdr" style="padding:11px 15px 13px">
+    <div style="font-size:16px;font-weight:500">Session history</div>
+    <div style="font-size:11px;opacity:.65">42 total this month</div>
+  </div>
+  <div class="hist-filters">
+    <div class="hf on">All</div>
+    <div class="hf off">MTM</div>
+    <div class="hf off">Flagged</div>
+    <div class="hf off">This week</div>
+  </div>
+  <div class="hist-list">
+    <div class="hist-item" id="btn-hist-ns"><div class="hi-top"><div class="hi-av a" style="background:#E1F5EE;color:#085041">NS</div><div class="hi-n">Navjot Singh</div><div class="hi-date">Today · 9:38 AM</div></div><div class="hi-reason">Drug interaction — Atorvastatin + CoQ10</div><div class="hi-tags"><div class="hi-tag">12 min</div><div class="hi-tag">Chat</div><div class="hi-tag flag">Flag</div></div></div>
+    <div class="hist-item"><div class="hi-top"><div class="hi-av" style="background:#E6F1FB;color:#185FA5">PK</div><div class="hi-n">Priya Kaur</div><div class="hi-date">Today · 8:55 AM</div></div><div class="hi-reason">Missed dose guidance · Metformin</div><div class="hi-tags"><div class="hi-tag">8 min</div><div class="hi-tag">Chat</div></div></div>
+    <div class="hist-item"><div class="hi-top"><div class="hi-av" style="background:#FAEEDA;color:#854F0B">MR</div><div class="hi-n">Maria Rodriguez</div><div class="hi-date">Yesterday · 3:12 PM</div></div><div class="hi-reason">OTC recommendation — cold symptoms</div><div class="hi-tags"><div class="hi-tag">6 min</div><div class="hi-tag">Chat</div><div class="hi-tag mtm">MTM</div></div></div>
+    <div class="hist-item"><div class="hi-top"><div class="hi-av" style="background:#EEEDFE;color:#534AB7">DJ</div><div class="hi-n">David Johnson</div><div class="hi-date">Yesterday · 1:05 PM</div></div><div class="hi-reason">Blood pressure medication review</div><div class="hi-tags"><div class="hi-tag">15 min</div><div class="hi-tag">Video</div><div class="hi-tag mtm">MTM</div></div></div>
+    <div class="hist-item"><div class="hi-top"><div class="hi-av" style="background:#E1F5EE;color:#085041">LS</div><div class="hi-n">Linda Shah</div><div class="hi-date">Mar 21 · 11:30 AM</div></div><div class="hi-reason">Insulin dosing question</div><div class="hi-tags"><div class="hi-tag">9 min</div><div class="hi-tag">Chat</div></div></div>
+  </div>
+  <div class="nav">
+    <div class="ni" data-nav="s-dash"><div class="ni-ic">&#9638;</div><span>Dashboard</span></div>
+    <div class="ni queue-tab" data-nav="s-queue"><div class="ni-ic">&#128203;</div><span>Queue</span></div>
+    <div class="ni on" data-nav="s-hist"><div class="ni-ic">&#128196;</div><span>History</span></div>
+    <div class="ni" data-nav="s-prof"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="scr" id="s-prof">
+  <div class="sb dt"><span>9:41</span><span>&#9646;&#9646;&#9646;</span></div>
+  <div class="prof-top">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px"><div class="prof-av">RS</div><div><div style="font-size:16px;font-weight:500">Dr. Ravi Sharma</div><div style="font-size:11px;opacity:.65">PharmD · License #CA-28841</div></div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><div class="pchip">California</div><div class="pchip">MTM Certified</div><div class="pchip">47 consults/mo</div></div>
+  </div>
+  <div style="flex:1;padding:11px 14px;overflow:hidden">
+    <div class="avail-toggle">
+      <div class="toggle-dot" id="avail-dot"></div>
+      <div><div class="toggle-lbl" id="avail-lbl">Available for consultations</div><div class="toggle-sub" id="avail-sub">Patients can request you now</div></div>
+      <div class="toggle-btn" id="avail-btn">Go offline</div>
+    </div>
+    <div class="prof-sec">
+      <div class="prof-row" data-nav="s-queue"><div class="pr-left"><div class="pr-icon">&#128203;</div><div style="font-size:12px;color:#04342C">Consultation queue</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+      <div class="prof-row" data-nav="s-hist"><div class="pr-left"><div class="pr-icon">&#128196;</div><div style="font-size:12px;color:#04342C">Session history</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#128200;</div><div style="font-size:12px;color:#04342C">My performance stats</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+    </div>
+    <div class="prof-sec">
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#127760;</div><div style="font-size:12px;color:#04342C">Licensed states</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#128276;</div><div style="font-size:12px;color:#04342C">Notification preferences</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+      <div class="prof-row"><div class="pr-left"><div class="pr-icon">&#128274;</div><div style="font-size:12px;color:#04342C">Privacy &amp; compliance</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+    </div>
+    <div class="prof-sec">
+      <div class="prof-row" id="btn-signout"><div class="pr-left"><div class="pr-icon" style="background:#FCEBEB">&#128682;</div><div style="font-size:12px;color:#A32D2D">Sign out</div></div><div style="font-size:14px;color:#5A7269">›</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="ni" data-nav="s-dash"><div class="ni-ic">&#9638;</div><span>Dashboard</span></div>
+    <div class="ni queue-tab" data-nav="s-queue"><div class="ni-ic">&#128203;</div><span>Queue</span></div>
+    <div class="ni" data-nav="s-hist"><div class="ni-ic">&#128196;</div><span>History</span></div>
+    <div class="ni on" data-nav="s-prof"><div class="ni-ic">&#128100;</div><span>Profile</span></div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const patients={
+  ns:{av:"NS",name:"Navjot Singh",sub:"M · 47 yrs · Type 2 Diabetes, Hypertension",meds:5,adh:"82%",flags:1,consults:7,flagT:"⚠ Interaction flag · Review before consult",flagB:"Atorvastatin + CoQ10 supplement — minor interaction, timing-based. Patient asking for guidance."},
+  pk:{av:"PK",name:"Priya Kaur",sub:"F · 52 yrs · Type 2 Diabetes",meds:3,adh:"68%",flags:0,consults:3,flagT:"",flagB:""},
+  mr:{av:"MR",name:"Maria Rodriguez",sub:"F · 38 yrs · Hypertension",meds:2,adh:"89%",flags:0,consults:5,flagT:"",flagB:""}
+};
+let currentPatient="ns";
+let timerInterval=null;
+let timerSecs=0;
+let isAvailable=true;
+
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));const el=document.getElementById(id);if(el)el.classList.add('on');}
+function navGo(id){
+  go(id);
+  document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('on',n.getAttribute('data-nav')===id));
+}
+function loadPatient(key){
+  currentPatient=key;
+  const p=patients[key];
+  document.getElementById('pt-av-lbl').textContent=p.av;
+  document.getElementById('pt-ctx-name').textContent=p.name;
+  document.getElementById('pt-ctx-sub').textContent=p.sub;
+  document.getElementById('ptq-meds').textContent=p.meds;
+  document.getElementById('ptq-adh').textContent=p.adh;
+  document.getElementById('ptq-flags').textContent=p.flags;
+  document.getElementById('ptq-consults').textContent=p.consults;
+  const fc=document.getElementById('pt-flag-card');
+  if(p.flagT){fc.style.display='block';document.getElementById('pt-flag-t').textContent=p.flagT;document.getElementById('pt-flag-b').textContent=p.flagB;}
+  else{fc.style.display='none';}
+  go('s-ptctx');
+}
+function startConsult(key){
+  const p=patients[key];
+  document.getElementById('consult-av').textContent=p.av;
+  document.getElementById('consult-pname').textContent=p.name;
+  document.getElementById('consult-msgs').innerHTML='<div class="tchip">Session started · 9:38 AM</div><div class="bbl r"><div class="bt2">Hi — I have a question about my medications.</div><div class="bts">9:38 AM</div></div>';
+  timerSecs=0;
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{timerSecs++;const m=Math.floor(timerSecs/60);const s=timerSecs%60;document.getElementById('consult-timer').textContent=m+':'+(s<10?'0':'')+s;},1000);
+  go('s-consult');
+}
+
+document.getElementById('btn-signin').addEventListener('click',()=>navGo('s-dash'));
+document.getElementById('btn-signout').addEventListener('click',()=>{if(timerInterval)clearInterval(timerInterval);go('s-splash');});
+
+document.querySelectorAll('[data-nav]').forEach(n=>n.addEventListener('click',()=>navGo(n.getAttribute('data-nav'))));
+
+document.getElementById('btn-dash-ns').addEventListener('click',()=>loadPatient('ns'));
+document.getElementById('btn-dash-pk').addEventListener('click',()=>loadPatient('pk'));
+document.getElementById('btn-dash-mr').addEventListener('click',()=>loadPatient('mr'));
+document.getElementById('btn-q-ns').addEventListener('click',()=>loadPatient('ns'));
+document.getElementById('btn-q-pk').addEventListener('click',()=>loadPatient('pk'));
+document.getElementById('btn-q-mr').addEventListener('click',()=>loadPatient('mr'));
+document.getElementById('btn-hist-ns').addEventListener('click',()=>loadPatient('ns'));
+
+document.getElementById('btn-back-ptctx').addEventListener('click',()=>navGo('s-queue'));
+document.getElementById('btn-start-consult').addEventListener('click',()=>startConsult(currentPatient));
+document.getElementById('btn-medrev').addEventListener('click',()=>go('s-medrev'));
+document.getElementById('btn-back-consult').addEventListener('click',()=>{if(timerInterval)clearInterval(timerInterval);go('s-ptctx');});
+document.getElementById('btn-back-mtm').addEventListener('click',()=>go('s-ptctx'));
+document.getElementById('btn-back-medrev').addEventListener('click',()=>go('s-ptctx'));
+document.getElementById('btn-goto-mtm').addEventListener('click',()=>go('s-mtm'));
+document.getElementById('btn-mtm-submit').addEventListener('click',()=>navGo('s-queue'));
+
+const pharmaReplies=[
+  "No need to stop the CoQ10 — just take it 2 hours apart from Atorvastatin to avoid absorption issues.",
+  "That's a minor, manageable interaction. No medication changes needed.",
+  "I've noted this in your session. Is there anything else I can help you with?",
+  "Great question. I'd recommend continuing as prescribed and checking in if symptoms develop.",
+  "Let me review your full medication list and get back to you on that."
+];
+let pi=0;
+function sendConsult(){
+  const inp=document.getElementById('consult-in');const v=inp.value.trim();if(!v)return;inp.value='';
+  const msgs=document.getElementById('consult-msgs');
+  const sw=document.createElement('div');sw.className='bbl s';sw.innerHTML=`<div class="bt2">${v}</div><div class="bts">Just now</div>`;
+  msgs.appendChild(sw);msgs.scrollTop=msgs.scrollHeight;
+  const tw=document.createElement('div');tw.className='bbl r';tw.innerHTML=`<div class="bt2" style="padding:5px 9px"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  msgs.appendChild(tw);msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    msgs.removeChild(tw);
+    const rw=document.createElement('div');rw.className='bbl r';rw.innerHTML=`<div class="bt2">${pharmaReplies[pi%pharmaReplies.length]}</div><div class="bts">Just now</div>`;
+    pi++;msgs.appendChild(rw);msgs.scrollTop=msgs.scrollHeight;
+  },1200);
+}
+document.getElementById('consult-snd').addEventListener('click',sendConsult);
+document.getElementById('consult-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendConsult();});
+
+document.querySelectorAll('.hf').forEach(f=>f.addEventListener('click',()=>{document.querySelectorAll('.hf').forEach(x=>{x.classList.remove('on');x.classList.add('off');});f.classList.add('on');f.classList.remove('off');}));
+
+document.getElementById('avail-btn').addEventListener('click',()=>{
+  isAvailable=!isAvailable;
+  const dot=document.getElementById('avail-dot');
+  const lbl=document.getElementById('avail-lbl');
+  const sub=document.getElementById('avail-sub');
+  const btn=document.getElementById('avail-btn');
+  if(isAvailable){dot.classList.remove('off');lbl.textContent='Available for consultations';sub.textContent='Patients can request you now';btn.textContent='Go offline';btn.style.background='#0F6E56';}
+  else{dot.classList.add('off');lbl.textContent='Currently offline';sub.textContent='You will not receive new requests';btn.textContent='Go online';btn.style.background='#888780';}
+});
+</script>
+</body>
+</html>
