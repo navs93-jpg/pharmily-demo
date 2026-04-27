@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmily — Your Pharmacist, In Your Pocket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage-dark: #3A6351;
+  --sage: #4E8C72;
+  --sage-mid: #6BA888;
+  --sage-light: #E8F5EE;
+  --sage-pale: #F2FAF5;
+  --rx-dark: #085041;
+  --rx-mid: #0F6E56;
+  --cream: #FBF8F3;
+  --warm-white: #FEFCFA;
+  --text-dark: #0A2018;
+  --text-mid: #3A5A48;
+  --text-muted: #7A9E8A;
+  --border: #C8E8D4;
+  --warn: #E24B4A;
+  --amber: #BA7517;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--warm-white);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* ── TYPOGRAPHY ── */
+h1,h2,h3 { font-family: 'DM Serif Display', serif; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 48px;
+  background: rgba(251,248,243,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(200,232,212,0.4);
+  transition: padding 0.3s;
+}
+.nav-logo { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--sage-dark); text-decoration: none; }
+.nav-logo span { color: var(--sage); }
+.nav-links { display: flex; align-items: center; gap: 36px; }
+.nav-links a { font-size: 14px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: color 0.2s; }
+.nav-links a:hover { color: var(--sage-dark); }
+.nav-cta {
+  background: var(--sage-dark); color: white;
+  padding: 10px 22px; border-radius: 50px;
+  font-size: 14px; font-weight: 600;
+  text-decoration: none; transition: background 0.2s, transform 0.15s;
+}
+.nav-cta:hover { background: var(--sage); transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--cream);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(78,140,114,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(58,99,81,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(107,168,136,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pill-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.pill-bg svg { width: 100%; height: 100%; }
+
+.hero-content { position: relative; text-align: center; max-width: 760px; z-index: 2; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white; border: 1px solid var(--border);
+  border-radius: 50px; padding: 6px 16px; margin-bottom: 28px;
+  font-size: 13px; font-weight: 500; color: var(--sage-dark);
+  box-shadow: 0 2px 12px rgba(58,99,81,0.08);
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+
+.hero h1 {
+  font-size: clamp(44px, 7vw, 72px);
+  line-height: 1.1; letter-spacing: -1.5px;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  animation: fadeUp 0.7s 0.1s ease both;
+}
+.hero h1 em { font-style: italic; color: var(--sage-dark); }
+.hero p {
+  font-size: 18px; line-height: 1.7; color: var(--text-mid);
+  max-width: 540px; margin: 0 auto 40px;
+  font-weight: 300;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+.hero-actions {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.7s 0.3s ease both;
+}
+.btn-primary {
+  background: var(--sage-dark); color: white;
+  padding: 15px 32px; border-radius: 50px;
+  font-size: 15px; font-weight: 600;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(58,99,81,0.25);
+}
+.btn-primary:hover { background: var(--sage); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(58,99,81,0.3); }
+.btn-secondary {
+  background: white; color: var(--sage-dark);
+  padding: 15px 32px; border-radius: 50px;
+  font-size: 15px; font-weight: 600;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  border: 1.5px solid var(--border);
+  transition: border-color 0.2s, transform 0.15s;
+}
+.btn-secondary:hover { border-color: var(--sage); transform: translateY(-2px); }
+
+/* Phone mockup in hero */
+.hero-phones {
+  position: relative; margin-top: 64px; height: 420px;
+  display: flex; justify-content: center; align-items: flex-end;
+  animation: fadeUp 0.8s 0.4s ease both;
+  z-index: 2;
+}
+.phone-mock {
+  width: 200px; height: 380px;
+  background: #1A1A1A; border-radius: 32px; padding: 9px;
+  box-shadow: 0 40px 80px rgba(10,32,24,0.25), 0 0 0 1px rgba(255,255,255,0.05);
+  position: relative;
+}
+.phone-mock.center {
+  z-index: 3; transform: translateY(0) scale(1.05);
+  box-shadow: 0 50px 100px rgba(10,32,24,0.3), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.phone-mock.left { transform: rotate(-8deg) translateX(30px) translateY(20px); z-index: 2; opacity: 0.85; }
+.phone-mock.right { transform: rotate(8deg) translateX(-30px) translateY(20px); z-index: 2; opacity: 0.85; }
+.phone-screen {
+  width: 100%; height: 100%; border-radius: 24px; overflow: hidden;
+  background: #F2FAF5; display: flex; flex-direction: column;
+}
+.ps-hdr2 {
+  padding: 10px 12px 8px;
+  background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+  color: white;
+}
+.ps-hdr2 .g { font-size: 9px; opacity: .7; }
+.ps-hdr2 .n { font-size: 13px; font-weight: 700; }
+.ps-hdr2 .s { font-size: 8px; opacity: .6; }
+.ps-ring2 {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(58,99,81,0.9); margin: 8px 10px; border-radius: 10px; padding: 8px 10px; color: white;
+}
+.ps-ring2 .val { font-size: 18px; font-weight: 700; }
+.ps-ring2 .lbl { font-size: 8px; opacity: .8; }
+.ps-ring2 .sub { font-size: 7px; opacity: .65; }
+.med-item {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.88); border-radius: 8px;
+  border: .5px solid var(--border); padding: 6px 8px; margin: 0 10px 5px;
+}
+.med-dot2 { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.med-name2 { font-size: 8px; font-weight: 600; color: var(--text-dark); flex: 1; }
+.med-badge2 { font-size: 7px; padding: 2px 6px; border-radius: 10px; }
+.ps-nav2 {
+  margin-top: auto; display: flex; justify-content: space-around;
+  padding: 6px 6px 8px; background: rgba(255,255,255,.6);
+  backdrop-filter: blur(10px); border-top: .5px solid rgba(200,232,212,.5);
+}
+.ps-ni2 { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 6px; color: var(--text-muted); }
+.ps-ni2.on { color: var(--sage); }
+
+/* ── SECTION SHARED ── */
+.section { padding: 96px 48px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 12px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--sage); margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(32px, 5vw, 52px); line-height: 1.15;
+  letter-spacing: -1px; color: var(--text-dark); margin-bottom: 18px;
+}
+.section-sub {
+  font-size: 17px; line-height: 1.7; color: var(--text-mid);
+  font-weight: 300; max-width: 560px;
+}
+
+/* ── HOW IT WORKS ── */
+.how { background: var(--cream); }
+.steps {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px; margin-top: 56px;
+}
+.step {
+  padding: 32px 28px;
+  background: white; border-radius: 20px;
+  border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.step:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(58,99,81,0.1); }
+.step-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 64px; font-weight: 400; line-height: 1;
+  color: var(--sage-light); position: absolute; top: 16px; right: 20px;
+}
+.step-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: var(--sage-light); display: flex; align-items: center;
+  justify-content: center; font-size: 22px; margin-bottom: 18px;
+}
+.step h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 10px; }
+.step p { font-size: 14px; line-height: 1.7; color: var(--text-mid); font-weight: 300; }
+
+/* ── FEATURES ── */
+.features { background: var(--warm-white); }
+.features-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; margin-top: 56px;
+}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr;}}
+.feat-card {
+  background: white; border: 1px solid var(--border); border-radius: 20px;
+  padding: 32px; display: flex; gap: 20px; align-items: flex-start;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.feat-card:hover { border-color: var(--sage-mid); box-shadow: 0 12px 40px rgba(78,140,114,0.1); transform: translateY(-2px); }
+.feat-card.large { grid-column: span 2; }
+@media(max-width:768px){.feat-card.large{grid-column:span 1;}}
+.feat-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: var(--sage-light); display: flex; align-items: center;
+  justify-content: center; font-size: 24px; flex-shrink: 0;
+}
+.feat-icon.dark { background: var(--sage-dark); }
+.feat-body h3 { font-size: 19px; color: var(--text-dark); margin-bottom: 8px; }
+.feat-body p { font-size: 14px; line-height: 1.7; color: var(--text-mid); font-weight: 300; }
+.feat-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.feat-tag {
+  font-size: 11px; font-weight: 500; padding: 4px 11px;
+  border-radius: 20px; background: var(--sage-light); color: var(--sage-dark);
+}
+
+/* ── DUAL APP ── */
+.dual { background: var(--cream); }
+.dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+@media(max-width:768px){.dual-grid{grid-template-columns:1fr;}}
+.app-card2 {
+  border-radius: 24px; overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.app-card2:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(10,32,24,0.12); }
+.app-card2-header {
+  padding: 36px 32px 32px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.app-card2-header.patient { background: linear-gradient(135deg, var(--sage-dark), var(--sage)); }
+.app-card2-header.pharma { background: linear-gradient(135deg, var(--rx-dark), var(--rx-mid)); }
+.app-role { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.65); }
+.app-title2 { font-family: 'DM Serif Display', serif; font-size: 28px; color: white; }
+.app-desc2 { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.6; font-weight: 300; }
+.app-card2-body { background: white; padding: 28px 32px; }
+.app-features-list { display: flex; flex-direction: column; gap: 12px; }
+.afl-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-mid); }
+.afl-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
+.app-card2-cta {
+  display: block; text-align: center;
+  margin-top: 24px; padding: 13px;
+  border-radius: 14px; font-size: 14px; font-weight: 600;
+  text-decoration: none; transition: opacity 0.2s, transform 0.15s;
+}
+.app-card2-cta.patient { background: var(--sage-dark); color: white; }
+.app-card2-cta.pharma { background: var(--rx-dark); color: white; }
+.app-card2-cta:hover { opacity: .88; transform: scale(.98); }
+
+/* ── STATS ── */
+.stats-strip {
+  background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+  padding: 64px 48px;
+}
+.stats-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr;}}
+.stat-item2 { text-align: center; }
+.stat-val { font-family: 'DM Serif Display', serif; font-size: 44px; color: white; line-height: 1; }
+.stat-val span { color: rgba(255,255,255,0.6); font-size: 28px; }
+.stat-lbl2 { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 6px; font-weight: 300; }
+
+/* ── FOUNDER ── */
+.founder { background: var(--warm-white); }
+.founder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 56px; }
+@media(max-width:768px){.founder-grid{grid-template-columns:1fr;gap:40px;}}
+.founder-photo {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.founder-initials {
+  font-family: 'DM Serif Display', serif;
+  font-size: 96px; color: rgba(255,255,255,.25); user-select: none;
+}
+.founder-badge-wrap { position: absolute; bottom: 24px; left: 24px; right: 24px; }
+.founder-badge {
+  background: rgba(255,255,255,.15); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.25); border-radius: 16px;
+  padding: 14px 18px; color: white;
+}
+.founder-badge .name { font-size: 16px; font-weight: 600; }
+.founder-badge .title { font-size: 12px; opacity: .75; margin-top: 3px; }
+.founder-text h2 { margin-bottom: 20px; }
+.founder-text p { font-size: 16px; line-height: 1.8; color: var(--text-mid); font-weight: 300; margin-bottom: 16px; }
+.founder-credentials { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.cred {
+  font-size: 13px; font-weight: 500; padding: 7px 14px;
+  border-radius: 50px; border: 1.5px solid var(--border);
+  color: var(--sage-dark); background: var(--sage-light);
+}
+
+/* ── WAITLIST ── */
+.waitlist {
+  background: var(--cream);
+  padding: 96px 48px;
+}
+.waitlist-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+.waitlist h2 { margin-bottom: 16px; }
+.waitlist p { font-size: 17px; color: var(--text-mid); line-height: 1.7; font-weight: 300; margin-bottom: 40px; }
+.waitlist-tabs {
+  display: flex; border: 1px solid var(--border);
+  border-radius: 50px; padding: 4px; background: white;
+  max-width: 320px; margin: 0 auto 32px;
+}
+.wtab {
+  flex: 1; padding: 10px; text-align: center; border-radius: 50px;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+  color: var(--text-muted);
+}
+.wtab.active { background: var(--sage-dark); color: white; }
+.waitlist-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: flex; gap: 12px; }
+@media(max-width:600px){.form-row{flex-direction:column;}}
+.form-input {
+  flex: 1; padding: 14px 18px; border-radius: 14px;
+  border: 1.5px solid var(--border); background: white;
+  font-size: 15px; color: var(--text-dark); outline: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(78,140,114,0.12); }
+.form-input::placeholder { color: var(--text-muted); }
+.form-select {
+  flex: 1; padding: 14px 18px; border-radius: 14px;
+  border: 1.5px solid var(--border); background: white;
+  font-size: 15px; color: var(--text-dark); outline: none;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.form-select:focus { border-color: var(--sage); }
+.form-submit {
+  padding: 16px; border-radius: 14px; border: none;
+  background: var(--sage-dark); color: white;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.2s, transform 0.15s;
+}
+.form-submit:hover { background: var(--sage); transform: translateY(-1px); }
+.form-note { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+.success-msg {
+  display: none; padding: 20px; border-radius: 16px;
+  background: var(--sage-light); border: 1px solid var(--border);
+  color: var(--sage-dark); font-weight: 500; font-size: 15px;
+}
+
+/* ── CONTACT ── */
+.contact { background: linear-gradient(135deg, var(--sage-dark) 0%, #2A4E3A 100%); padding: 96px 48px; }
+.contact-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+@media(max-width:768px){.contact-inner{grid-template-columns:1fr;gap:48px;}}
+.contact-left h2 { color: white; margin-bottom: 16px; }
+.contact-left p { font-size: 16px; color: rgba(255,255,255,.7); line-height: 1.7; font-weight: 300; }
+.contact-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+.contact-card {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+  border-radius: 16px; padding: 16px 20px;
+}
+.contact-card-icon { font-size: 22px; width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contact-card-text .label { font-size: 11px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .08em; }
+.contact-card-text .val { font-size: 14px; color: white; font-weight: 500; margin-top: 2px; }
+.contact-form { display: flex; flex-direction: column; gap: 14px; }
+.contact-form .form-input { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); color: white; }
+.contact-form .form-input::placeholder { color: rgba(255,255,255,.4); }
+.contact-form .form-input:focus { border-color: rgba(255,255,255,.5); box-shadow: 0 0 0 3px rgba(255,255,255,.08); }
+.contact-form textarea.form-input { resize: vertical; min-height: 130px; }
+.contact-form .form-submit { background: white; color: var(--sage-dark); }
+.contact-form .form-submit:hover { background: var(--sage-light); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--text-dark); padding: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+.footer-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: white; }
+.footer-logo span { color: var(--sage-mid); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: rgba(255,255,255,.45); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: white; }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,.3); }
+
+/* ── BADGES ── */
+.hipaa-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--sage-light); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; font-size: 12px;
+  font-weight: 600; color: var(--sage-dark);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── MOBILE NAV ── */
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.hamburger span { width: 22px; height: 2px; background: var(--sage-dark); border-radius: 2px; transition: all 0.3s; }
+@media(max-width:768px){
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .section { padding: 64px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .stats-strip { padding: 48px 24px; }
+  .waitlist { padding: 64px 24px; }
+  .contact { padding: 64px 24px; }
+  footer { padding: 32px 24px; flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" href="#">Pharmi<span>ly</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#apps">The apps</a>
+    <a href="#founder">About</a>
+    <a href="#waitlist" class="nav-cta">Join waitlist</a>
+  </div>
+  <div class="hamburger" onclick="document.querySelector('.nav-links').style.display='flex'">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Decorative pill outlines -->
+  <div class="pill-bg">
+    <svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="rgba(78,140,114,0.12)" stroke-width="1.5">
+        <ellipse cx="80" cy="140" rx="55" ry="18" transform="rotate(-30 80 140)"/>
+        <line x1="80" y1="122" x2="80" y2="158" stroke="rgba(78,140,114,0.08)" transform="rotate(-30 80 140)"/>
+        <ellipse cx="1320" cy="200" rx="65" ry="20" transform="rotate(20 1320 200)"/>
+        <line x1="1320" y1="180" x2="1320" y2="220" stroke="rgba(78,140,114,0.08)" transform="rotate(20 1320 200)"/>
+        <ellipse cx="200" cy="680" rx="48" ry="15" transform="rotate(45 200 680)"/>
+        <ellipse cx="1200" cy="650" rx="60" ry="19" transform="rotate(-15 1200 650)"/>
+        <ellipse cx="700" cy="60" rx="42" ry="14" transform="rotate(10 700 60)"/>
+        <ellipse cx="900" cy="740" rx="52" ry="17" transform="rotate(-40 900 740)"/>
+        <ellipse cx="1100" cy="120" rx="38" ry="12" transform="rotate(55 1100 120)"/>
+        <ellipse cx="350" cy="400" rx="70" ry="22" transform="rotate(-25 350 400)"/>
+        <ellipse cx="1050" cy="420" rx="44" ry="14" transform="rotate(35 1050 420)"/>
+        <ellipse cx="600" cy="720" rx="50" ry="16" transform="rotate(-50 600 720)"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Now in development · California pilot 2026
+    </div>
+    <h1>Your pharmacist,<br><em>in your pocket.</em></h1>
+    <p>Pharmily connects patients with licensed pharmacists on demand — 24/7, in their language, on their schedule. Medication care reimagined for the digital age.</p>
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">Join the waitlist →</a>
+      <a href="pharmily-demo.html" class="btn-secondary" target="_blank">Try patient demo ↗</a>
+    </div>
+  </div>
+
+  <div class="hero-phones">
+    <!-- Left phone (pharmacist) -->
+    <div class="phone-mock left">
+      <div class="phone-screen" style="background:#F2F8F7;">
+        <div style="background:linear-gradient(135deg,#085041,#0F6E56);padding:10px 12px 8px;color:white;">
+          <div style="font-size:8px;opacity:.7">Welcome back,</div>
+          <div style="font-size:12px;font-weight:700;">Dr. Sharma</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:8px 10px;">
+          <div style="background:#0F6E56;border-radius:8px;padding:7px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:white;">3</div>
+            <div style="font-size:7px;color:rgba(255,255,255,.75);">Queue</div>
+          </div>
+          <div style="background:white;border-radius:8px;padding:7px;text-align:center;border:.5px solid #9FE1CB;">
+            <div style="font-size:16px;font-weight:700;color:#085041;">12</div>
+            <div style="font-size:7px;color:#5A7269;">Today</div>
+          </div>
+        </div>
+        <div style="padding:0 10px;font-size:7px;font-weight:600;color:#5A7269;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Queue</div>
+        <div style="margin:0 10px 5px;background:white;border-radius:8px;padding:6px 8px;border-left:2px solid #E24B4A;border:.5px solid #9FE1CB;display:flex;align-items:center;gap:6px;">
+          <div style="width:18px;height:18px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#085041;flex-shrink:0;">ML</div>
+          <div style="flex:1;"><div style="font-size:8px;font-weight:600;color:#04342C;">Marcus Lee</div><div style="font-size:7px;color:#5A7269;">Drug interaction</div></div>
+          <div style="font-size:7px;background:#FCEBEB;color:#A32D2D;padding:2px 5px;border-radius:8px;">Urgent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Centre phone (patient) -->
+    <div class="phone-mock center">
+      <div class="phone-screen">
+        <div class="ps-hdr2">
+          <div class="g">Good morning,</div>
+          <div class="n">Alex Carter</div>
+          <div class="s">3 reminders today</div>
+        </div>
+        <div class="ps-ring2">
+          <div>
+            <div class="val">82%</div>
+            <div class="lbl">Adherence</div>
+            <div class="sub">9/11 doses this week</div>
+          </div>
+        </div>
+        <div style="font-size:8px;font-weight:600;color:#4A6B5A;text-transform:uppercase;letter-spacing:.05em;padding:0 10px;margin-bottom:6px;">Today's medications</div>
+        <div class="med-item">
+          <div class="med-dot2" style="background:#4E8C72"></div>
+          <div style="flex:1"><div class="med-name2">Metformin 500mg</div><div style="font-size:7px;color:#7A9E8A;">With breakfast · 8:00 AM</div></div>
+          <div class="med-badge2" style="background:#E8F5EE;color:#3A6351;">Taken</div>
+        </div>
+        <div class="med-item">
+          <div class="med-dot2" style="background:#BA7517"></div>
+          <div style="flex:1"><div class="med-name2">Lisinopril 10mg</div><div style="font-size:7px;color:#7A9E8A;">Morning · Due now</div></div>
+          <div class="med-badge2" style="background:#FAEEDA;color:#854F0B;">Due</div>
+        </div>
+        <div class="med-item">
+          <div class="med-dot2" style="background:#E24B4A"></div>
+          <div style="flex:1"><div class="med-name2">Atorvastatin 20mg</div><div style="font-size:7px;color:#7A9E8A;">Evening · Flag</div></div>
+          <div class="med-badge2" style="background:#FCEBEB;color:#A32D2D;">Review</div>
+        </div>
+        <div class="ps-nav2">
+          <div class="ps-ni2 on">⊞<span>Home</span></div>
+          <div class="ps-ni2">💊<span>Meds</span></div>
+          <div class="ps-ni2">💬<span>Consult</span></div>
+          <div class="ps-ni2">🤖<span>AI</span></div>
+          <div class="ps-ni2">👤<span>Profile</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right phone (MedGuide) -->
+    <div class="phone-mock right">
+      <div class="phone-screen">
+        <div style="background:linear-gradient(135deg,#3A6351,#4E8C72);padding:10px 12px 10px;color:white;display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.85);"></div></div>
+          <div><div style="font-size:11px;font-weight:700;">AI MedGuide</div><div style="font-size:8px;opacity:.7;">Medication assistant</div></div>
+        </div>
+        <div style="padding:10px 10px 6px;">
+          <div style="font-size:9px;color:#4A6B5A;margin-bottom:8px;">Try asking:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <div style="font-size:8px;background:rgba(255,255,255,.9);border:.5px solid #C8E8D4;border-radius:12px;padding:4px 8px;color:#3A6351;">Can I take ibuprofen?</div>
+            <div style="font-size:8px;background:rgba(255,255,255,.9);border:.5px solid #C8E8D4;border-radius:12px;padding:4px 8px;color:#3A6351;">Side effects?</div>
+            <div style="font-size:8px;background:rgba(255,255,255,.9);border:.5px solid #C8E8D4;border-radius:12px;padding:4px 8px;color:#3A6351;">Skip a dose?</div>
+          </div>
+        </div>
+        <div style="margin:6px 10px;display:flex;gap:6px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:#3A6351;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.85);"></div></div>
+          <div style="background:rgba(255,255,255,.9);border:.5px solid #C8E8D4;border-radius:3px 10px 10px 10px;padding:7px 9px;font-size:9px;color:#0A2018;line-height:1.5;">Based on your Lisinopril, ibuprofen is not recommended. Acetaminophen is safer for pain relief.</div>
+        </div>
+        <div style="margin:0 10px;background:#E8F5EE;border:.5px solid #C8E8D4;border-radius:8px;padding:6px 9px;font-size:8px;color:#3A6351;line-height:1.4;">Safer alternative: Acetaminophen (Tylenol) · Max 3000mg/day</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-grid">
+    <div class="stat-item2 reveal">
+      <div class="stat-val">$<span>528</span>B</div>
+      <div class="stat-lbl2">Lost to non-adherence annually</div>
+    </div>
+    <div class="stat-item2 reveal" style="transition-delay:.1s">
+      <div class="stat-val">350<span>M+</span></div>
+      <div class="stat-lbl2">Digital health app users globally</div>
+    </div>
+    <div class="stat-item2 reveal" style="transition-delay:.2s">
+      <div class="stat-val">$<span>500</span>B<span>+</span></div>
+      <div class="stat-lbl2">US pharmacy market annually</div>
+    </div>
+    <div class="stat-item2 reveal" style="transition-delay:.3s">
+      <div class="stat-val">24<span>/7</span></div>
+      <div class="stat-lbl2">Licensed pharmacist access</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section how" id="how">
+  <div class="section-inner">
+    <div class="section-label reveal">How it works</div>
+    <h2 class="section-title reveal">Pharmacy care,<br>simplified in 3 steps.</h2>
+    <p class="section-sub reveal">No appointments. No waiting rooms. No rushed 2-minute interactions. Just real pharmacist care, whenever you need it.</p>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-icon">📱</div>
+        <h3>Download & set up</h3>
+        <p>Create your profile, add your medications using the OCR label scanner, and accept HIPAA-compliant consent in under 5 minutes.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.1s">
+        <div class="step-num">2</div>
+        <div class="step-icon">💊</div>
+        <h3>Track your medications</h3>
+        <p>Pharmily monitors your adherence, surfaces drug interactions, and sends smart reminders — all personalised to your actual prescription list.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.2s">
+        <div class="step-num">3</div>
+        <div class="step-icon">💬</div>
+        <h3>Talk to your pharmacist</h3>
+        <p>Connect instantly with a licensed PharmD via chat or video — 24/7. Get the counselling you deserve, not a rushed conversation at the pickup counter.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.3s">
+        <div class="step-num">4</div>
+        <div class="step-icon">🤖</div>
+        <h3>AI MedGuide</h3>
+        <p>Ask anything about your medications at any hour. Our AI gives contextual, personalised guidance — and escalates to a real pharmacist when it matters.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features" id="features">
+  <div class="section-inner">
+    <div class="section-label reveal">Features</div>
+    <h2 class="section-title reveal">Everything your pharmacy<br>visit was missing.</h2>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon">💬</div>
+        <div class="feat-body">
+          <h3>24/7 pharmacist access</h3>
+          <p>Chat or video with a licensed pharmacist any time — no appointment, no waiting room. Get the counselling and education you deserve.</p>
+          <div class="feat-tags"><span class="feat-tag">Chat</span><span class="feat-tag">Video</span><span class="feat-tag">24/7</span></div>
+        </div>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.1s">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-body">
+          <h3>AI MedGuide</h3>
+          <p>Personalised medication guidance powered by AI and your actual prescription list. Always escalates to a real pharmacist for anything clinical.</p>
+          <div class="feat-tags"><span class="feat-tag">Interaction alerts</span><span class="feat-tag">OTC guidance</span></div>
+        </div>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.2s">
+        <div class="feat-icon">📷</div>
+        <div class="feat-body">
+          <h3>OCR label scanner</h3>
+          <p>Scan any pharmacy vial label and your medications are automatically extracted, verified, and added to your profile. No manual typing.</p>
+          <div class="feat-tags"><span class="feat-tag">Auto-extract</span><span class="feat-tag">Verify & confirm</span></div>
+        </div>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.3s">
+        <div class="feat-icon">🌐</div>
+        <div class="feat-body">
+          <h3>Multilingual support</h3>
+          <p>Translated medication instructions in Punjabi, Hindi, Spanish and more. Serving communities consistently underserved by retail pharmacy.</p>
+          <div class="feat-tags"><span class="feat-tag">Punjabi</span><span class="feat-tag">Hindi</span><span class="feat-tag">Spanish</span><span class="feat-tag">+more</span></div>
+        </div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">❤️</div>
+        <div class="feat-body">
+          <h3>Health tracking</h3>
+          <p>Log blood pressure and blood glucose readings directly from the home screen. View trends and share reports with your pharmacist before a consultation.</p>
+          <div class="feat-tags"><span class="feat-tag">Blood pressure</span><span class="feat-tag">Glucose</span><span class="feat-tag">Exportable</span></div>
+        </div>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.1s">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-body">
+          <h3>HIPAA compliant</h3>
+          <p>Encrypted data at rest and in transit, role-based access controls, and comprehensive audit logging — compliant from day one.</p>
+          <div class="feat-tags"><span class="feat-tag">Encrypted</span><span class="feat-tag">Role-based</span><span class="feat-tag">Audit logs</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DUAL APP -->
+<section class="section dual" id="apps">
+  <div class="section-inner">
+    <div class="section-label reveal">Two apps, one platform</div>
+    <h2 class="section-title reveal">Built for patients<br>and pharmacists.</h2>
+    <p class="section-sub reveal">Pharmily is two distinct experiences — one for patients managing their health, one for pharmacists doing their best work.</p>
+    <div class="dual-grid">
+      <div class="app-card2 reveal">
+        <div class="app-card2-header patient">
+          <div class="app-role">Patient app</div>
+          <div class="app-title2">For patients & caregivers</div>
+          <div class="app-desc2">Manage your medications, track your health, and access a licensed pharmacist whenever you need one.</div>
+        </div>
+        <div class="app-card2-body">
+          <div class="app-features-list">
+            <div class="afl-item"><div class="afl-dot"></div>Medication management & smart reminders</div>
+            <div class="afl-item"><div class="afl-dot"></div>24/7 pharmacist consultation (chat + video)</div>
+            <div class="afl-item"><div class="afl-dot"></div>AI MedGuide with drug interaction alerts</div>
+            <div class="afl-item"><div class="afl-dot"></div>OCR label scanner & OTC symptom checker</div>
+            <div class="afl-item"><div class="afl-dot"></div>Blood pressure & glucose tracker</div>
+            <div class="afl-item"><div class="afl-dot"></div>Multilingual medication instructions</div>
+          </div>
+          <a href="pharmily-demo.html" target="_blank" class="app-card2-cta patient">Try the patient app demo →</a>
+        </div>
+      </div>
+      <div class="app-card2 reveal" style="transition-delay:.15s">
+        <div class="app-card2-header pharma">
+          <div class="app-role">Pharmacist app</div>
+          <div class="app-title2">For licensed PharmDs</div>
+          <div class="app-desc2">Manage your consultation queue, review patient profiles, conduct consults, and document MTM sessions with CPT billing.</div>
+        </div>
+        <div class="app-card2-body">
+          <div class="app-features-list">
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>Live consultation queue with urgency triage</div>
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>Full patient context: meds, adherence, flags</div>
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>Real-time chat & video consultations</div>
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>MTM session notes with CPT billing codes</div>
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>Session history & audit logs</div>
+            <div class="afl-item"><div class="afl-dot" style="background:var(--rx-mid)"></div>Availability toggle & performance dashboard</div>
+          </div>
+          <a href="pharmily-pharmacist.html" target="_blank" class="app-card2-cta pharma">Try the pharmacist app demo →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section class="section founder" id="founder">
+  <div class="section-inner">
+    <div class="section-label reveal">About the founder</div>
+    <div class="founder-grid">
+      <div class="founder-photo reveal">
+        <div class="founder-initials">NS</div>
+        <div class="founder-badge-wrap">
+          <div class="founder-badge">
+            <div class="name">Navjot Singh, PharmD</div>
+            <div class="title">Founder & CEO · Licensed Pharmacist</div>
+          </div>
+        </div>
+      </div>
+      <div class="founder-text reveal" style="transition-delay:.15s">
+        <h2 class="section-title">Built by a pharmacist<br>who lived the problem.</h2>
+        <p>With over 10 years of retail and clinical pharmacy experience, Navjot Singh saw firsthand how patients were let down — rushed interactions, language barriers, zero after-hours access, and chronic medication non-adherence with no safety net.</p>
+        <p>Pharmily is his answer. A platform built not by a tech company that spotted a market, but by a licensed pharmacist who understood exactly what was missing — and what it takes to fix it.</p>
+        <p><em>"The average retail pharmacy interaction is under two minutes. That's not care — that's a transaction. Patients deserve better."</em></p>
+        <div class="founder-credentials">
+          <span class="cred">PharmD Licensed</span>
+          <span class="cred">10+ Years Clinical</span>
+          <span class="cred">California Pilot</span>
+          <span class="cred">MTM Specialist</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="section-label reveal" style="text-align:center">Join the waitlist</div>
+    <h2 class="section-title reveal" style="text-align:center">Be first when<br>we launch.</h2>
+    <p class="reveal" style="margin:0 auto 40px;">We're launching in California in 2026. Sign up below — whether you're a patient looking for better pharmacy care, or a licensed pharmacist interested in joining the platform.</p>
+
+    <div class="waitlist-tabs reveal">
+      <div class="wtab active" onclick="setTab('patient',this)">I'm a patient</div>
+      <div class="wtab" onclick="setTab('pharmacist',this)">I'm a pharmacist</div>
+    </div>
+
+    <div id="form-patient" class="waitlist-form reveal">
+      <div class="form-row">
+        <input class="form-input" type="text" placeholder="First name" id="p-fname">
+        <input class="form-input" type="text" placeholder="Last name" id="p-lname">
+      </div>
+      <input class="form-input" type="email" placeholder="Email address" id="p-email">
+      <select class="form-select" id="p-state">
+        <option value="" disabled selected>Select your state</option>
+        <option>California</option><option>Nevada</option><option>Oregon</option><option>Washington</option><option>Other</option>
+      </select>
+      <select class="form-select" id="p-condition">
+        <option value="" disabled selected>Primary health condition (optional)</option>
+        <option>Type 2 Diabetes</option><option>Hypertension</option><option>Heart disease</option>
+        <option>Multiple conditions</option><option>Other / prefer not to say</option>
+      </select>
+      <button class="form-submit" onclick="submitForm('patient')">Reserve my spot →</button>
+      <div class="form-note">No spam. No fees. Just early access when we launch.</div>
+      <div class="success-msg" id="success-patient">🎉 You're on the list! We'll be in touch when Pharmily launches in your area.</div>
+    </div>
+
+    <div id="form-pharmacist" class="waitlist-form reveal" style="display:none;">
+      <div class="form-row">
+        <input class="form-input" type="text" placeholder="First name" id="rx-fname">
+        <input class="form-input" type="text" placeholder="Last name" id="rx-lname">
+      </div>
+      <input class="form-input" type="email" placeholder="Professional email" id="rx-email">
+      <input class="form-input" type="text" placeholder="License number" id="rx-lic">
+      <select class="form-select" id="rx-state">
+        <option value="" disabled selected>Licensed state(s)</option>
+        <option>California</option><option>Nevada</option><option>Oregon</option><option>Washington</option><option>Multiple states</option>
+      </select>
+      <select class="form-select" id="rx-exp">
+        <option value="" disabled selected>Years of experience</option>
+        <option>0–2 years</option><option>3–5 years</option><option>6–10 years</option><option>10+ years</option>
+      </select>
+      <button class="form-submit" onclick="submitForm('pharmacist')">Apply to join the network →</button>
+      <div class="form-note">We'll review your application and reach out within 5 business days.</div>
+      <div class="success-msg" id="success-pharmacist">🎉 Application received! Our team will review your credentials and be in touch shortly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <h2 class="section-title" style="color:white">Get in touch.</h2>
+      <p>Investor inquiries, pharmacy partnership opportunities, or media requests — we'd love to hear from you.</p>
+      <div class="contact-cards">
+        <div class="contact-card">
+          <div class="contact-card-icon">📧</div>
+          <div class="contact-card-text">
+            <div class="label">Email</div>
+            <div class="val">hello@pharmily.com</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">📍</div>
+          <div class="contact-card-text">
+            <div class="label">Location</div>
+            <div class="val">California, United States</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">🏥</div>
+          <div class="contact-card-text">
+            <div class="label">Pilot</div>
+            <div class="val">Launching California 2026</div>
+          </div>
+        </div>
+        <div class="contact-card" style="cursor:pointer" onclick="window.open('pharmily-demo.html','_blank')">
+          <div class="contact-card-icon">📱</div>
+          <div class="contact-card-text">
+            <div class="label">Demo</div>
+            <div class="val">navs93-jpg.github.io/pharmily-demo →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="contact-form reveal">
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Your name" id="c-name">
+          <input class="form-input" type="email" placeholder="Email address" id="c-email">
+        </div>
+        <select class="form-select" id="c-type" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.8);">
+          <option value="" disabled selected>Type of enquiry</option>
+          <option>Investor enquiry</option>
+          <option>Pharmacy partnership</option>
+          <option>Press / media</option>
+          <option>Technical partnership</option>
+          <option>General question</option>
+        </select>
+        <textarea class="form-input" placeholder="Your message..." id="c-msg" rows="5"></textarea>
+        <button class="form-submit" onclick="submitContact()" style="background:white;color:var(--sage-dark);">Send message →</button>
+        <div class="success-msg" id="success-contact" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:white;">✅ Message received! We'll get back to you within 2 business days.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Pharmi<span>ly</span></div>
+  <div class="footer-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#apps">The apps</a>
+    <a href="#founder">About</a>
+    <a href="#waitlist">Waitlist</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Pharmily · Founded by Navjot Singh, PharmD · California · Confidential</div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav shrink on scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').style.padding = window.scrollY > 50 ? '12px 48px' : '18px 48px';
+});
+
+// Waitlist tabs
+function setTab(type, el) {
+  document.querySelectorAll('.wtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('form-patient').style.display = type === 'patient' ? 'flex' : 'none';
+  document.getElementById('form-pharmacist').style.display = type === 'pharmacist' ? 'flex' : 'none';
+}
+
+// Form submissions
+function submitForm(type) {
+  const fn = document.getElementById(type==='patient'?'p-fname':'rx-fname').value;
+  const em = document.getElementById(type==='patient'?'p-email':'rx-email').value;
+  if(!fn || !em) { alert('Please fill in your name and email to continue.'); return; }
+  document.getElementById('success-'+type).style.display = 'block';
+  document.querySelector('#form-'+type+' .form-submit').style.display = 'none';
+}
+
+function submitContact() {
+  const nm = document.getElementById('c-name').value;
+  const em = document.getElementById('c-email').value;
+  const msg = document.getElementById('c-msg').value;
+  if(!nm || !em || !msg) { alert('Please fill in all fields.'); return; }
+  document.getElementById('success-contact').style.display = 'block';
+  document.querySelector('.contact-form .form-submit').style.display = 'none';
+}
+
+// Smooth nav
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
